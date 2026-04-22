@@ -1,1 +1,66 @@
-Interface d'administration SOFRETMA TRANSIT — Gestion clients, actualités et médias
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Connexion | Administration SOFRETMA TRANSIT</title>
+  <meta name="robots" content="noindex, nofollow">
+  <link rel="icon" href="images/logo-sofretma-blanc.png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/admin.css">
+</head>
+<body>
+
+  <div class="login-page">
+    <div class="login-card">
+
+      <!-- Logo -->
+      <div class="login-card__logo">
+        <picture>
+          <source srcset="images/logo-sofretma-blanc.webp" type="image/webp">
+          <img src="images/logo-sofretma-blanc.png" alt="SOFRETMA TRANSIT" width="160">
+        </picture>
+      </div>
+
+      <!-- Titre -->
+      <h1 class="login-card__titre">Espace Administration</h1>
+      <p class="login-card__sous-titre">Accès réservé à l'équipe SOFRETMA TRANSIT</p>
+
+      <!-- Message erreur -->
+      <div class="alerte alerte--erreur" id="alerte-login" role="alert">
+        Mot de passe incorrect. Veuillez réessayer.
+      </div>
+
+      <!-- Formulaire connexion -->
+      <form class="login-card__form" id="formulaire-login" autocomplete="off">
+        <div class="form-groupe">
+          <label for="champ-mdp">Mot de passe</label>
+          <input
+            type="password"
+            id="champ-mdp"
+            name="mdp"
+            placeholder="••••••••"
+            autocomplete="current-password"
+            required
+          >
+        </div>
+        <button type="submit" class="btn btn--or btn--plein">
+          Accéder à l'administration
+        </button>
+      </form>
+
+      <!-- Pied de page -->
+      <p class="login-card__copyright">
+        © 2025 SOFRETMA TRANSIT<br>
+        Conçu par <strong>W2K-Digital</strong>
+      </p>
+
+    </div>
+  </div>
+
+  <script src="js/auth.js"></script>
+
+</body>
+</html>
