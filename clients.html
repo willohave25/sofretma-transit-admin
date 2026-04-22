@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Clients inscrits | Administration SOFRETMA TRANSIT</title>
+  <meta name="robots" content="noindex, nofollow">
+  <link rel="icon" href="images/logo-sofretma-blanc.png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/admin.css">
+</head>
+<body>
+
+  <div class="admin-layout">
+
+    <!-- SIDEBAR -->
+    <aside class="sidebar">
+      <div class="sidebar__logo">
+        <picture>
+          <source srcset="images/logo-sofretma-blanc.webp" type="image/webp">
+          <img src="images/logo-sofretma-blanc.png" alt="SOFRETMA TRANSIT" width="140">
+        </picture>
+      </div>
+      <nav class="sidebar__nav">
+        <a href="dashboard.html" class="sidebar__lien">
+          <span class="icone">🏠</span> Tableau de bord
+        </a>
+        <a href="clients.html" class="sidebar__lien actif">
+          <span class="icone">👥</span> Clients inscrits
+        </a>
+        <a href="paiements.html" class="sidebar__lien">
+          <span class="icone">💰</span> Paiements
+        </a>
+        <a href="actualites.html" class="sidebar__lien">
+          <span class="icone">📰</span> Actualités
+        </a>
+        <a href="medias.html" class="sidebar__lien">
+          <span class="icone">🖼️</span> Médiathèque
+        </a>
+        <a href="formulaires.html" class="sidebar__lien">
+          <span class="icone">📋</span> Formulaires reçus
+        </a>
+        <div class="sidebar__separateur"></div>
+      </nav>
+      <div class="sidebar__footer">
+        <button class="sidebar__deconnexion" id="btn-deconnexion">
+          <span class="icone">🚪</span> Déconnexion
+        </button>
+      </div>
+    </aside>
+
+    <!-- CONTENU PRINCIPAL -->
+    <div class="contenu-principal">
+
+      <header class="topbar">
+        <div style="display:flex;align-items:center;gap:12px;">
+          <button class="hamburger-admin" id="hamburger-admin" aria-label="Menu">
+            <span></span><span></span><span></span>
+          </button>
+          <h1 class="topbar__titre">Clients inscrits</h1>
+        </div>
+        <div class="topbar__droite">
+          <button class="btn btn--vert btn--sm" id="btn-export-clients">⬇ Export CSV</button>
+        </div>
+      </header>
+
+      <main class="page-contenu">
+
+        <!-- Barre d'outils -->
+        <div class="barre-outils">
+          <div class="barre-outils__recherche">
+            <input type="text" id="recherche-clients" placeholder="Rechercher par nom ou email...">
+          </div>
+          <select id="filtre-statut">
+            <option value="">Tous les statuts</option>
+            <option value="actif">Actif</option>
+            <option value="suspendu">Suspendu</option>
+          </select>
+        </div>
+
+        <!-- Tableau clients -->
+        <div class="card">
+          <div class="table-wrapper">
+            <table>
+              <thead>
+                <tr>
+                  <th>Nom</th>
+                  <th>Email</th>
+                  <th>Téléphone</th>
+                  <th>Date inscription</th>
+                  <th>Statut</th>
+                  <th>Actions</th>
+                </tr>
+              </thead>
+              <tbody id="tbody-clients">
+                <tr><td colspan="6" class="chargement">Chargement des données...</td></tr>
+              </tbody>
+            </table>
+          </div>
+          <div class="pagination">
+            <span class="pagination__info" id="info-pagination"></span>
+          </div>
+        </div>
+
+      </main>
+    </div>
+
+  </div>
+
+  <!-- MODALE DÉTAIL CLIENT -->
+  <div class="overlay" id="modale-detail-client">
+    <div class="modale">
+      <div class="modale__entete">
+        <h2 class="modale__titre">Détails du client</h2>
+        <button class="modale__fermer" aria-label="Fermer">✕</button>
+      </div>
+      <div class="modale__corps" id="detail-client-corps"></div>
+      <div class="modale__pied">
+        <button class="btn btn--gris btn-fermer-modale">Fermer</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Notifications -->
+  <div class="toast-container" id="toast-container"></div>
+
+  <script src="js/auth.js"></script>
+  <script src="js/clients.js"></script>
+
+</body>
+</html>
