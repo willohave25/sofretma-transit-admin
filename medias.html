@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Médiathèque | Administration SOFRETMA TRANSIT</title>
+  <meta name="robots" content="noindex, nofollow">
+  <link rel="icon" href="images/logo-sofretma-blanc.png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/admin.css">
+</head>
+<body>
+
+  <div class="admin-layout">
+
+    <!-- SIDEBAR -->
+    <aside class="sidebar">
+      <div class="sidebar__logo">
+        <picture>
+          <source srcset="images/logo-sofretma-blanc.webp" type="image/webp">
+          <img src="images/logo-sofretma-blanc.png" alt="SOFRETMA TRANSIT" width="140">
+        </picture>
+      </div>
+      <nav class="sidebar__nav">
+        <a href="dashboard.html" class="sidebar__lien">
+          <span class="icone">🏠</span> Tableau de bord
+        </a>
+        <a href="clients.html" class="sidebar__lien">
+          <span class="icone">👥</span> Clients inscrits
+        </a>
+        <a href="paiements.html" class="sidebar__lien">
+          <span class="icone">💰</span> Paiements
+        </a>
+        <a href="actualites.html" class="sidebar__lien">
+          <span class="icone">📰</span> Actualités
+        </a>
+        <a href="medias.html" class="sidebar__lien actif">
+          <span class="icone">🖼️</span> Médiathèque
+        </a>
+        <a href="formulaires.html" class="sidebar__lien">
+          <span class="icone">📋</span> Formulaires reçus
+        </a>
+        <div class="sidebar__separateur"></div>
+      </nav>
+      <div class="sidebar__footer">
+        <button class="sidebar__deconnexion" id="btn-deconnexion">
+          <span class="icone">🚪</span> Déconnexion
+        </button>
+      </div>
+    </aside>
+
+    <!-- CONTENU PRINCIPAL -->
+    <div class="contenu-principal">
+
+      <header class="topbar">
+        <div style="display:flex;align-items:center;gap:12px;">
+          <button class="hamburger-admin" id="hamburger-admin" aria-label="Menu">
+            <span></span><span></span><span></span>
+          </button>
+          <h1 class="topbar__titre">Médiathèque</h1>
+        </div>
+        <div class="topbar__droite">
+          <span class="topbar__admin" id="compteur-medias" style="color:var(--gris-moyen);font-size:.875rem;"></span>
+        </div>
+      </header>
+
+      <main class="page-contenu">
+
+        <!-- Zone d'upload -->
+        <div class="zone-upload" id="zone-upload">
+          <input type="file" id="input-fichier" accept="image/jpeg,image/png,image/webp,image/gif,video/mp4,video/quicktime" multiple>
+          <div class="zone-upload__icone">📤</div>
+          <div class="zone-upload__texte">Glissez vos fichiers ici ou <strong style="color:var(--or);">cliquez pour sélectionner</strong></div>
+          <div class="zone-upload__sous-texte">JPG, PNG, WebP, GIF, MP4, MOV · Taille max : 10 Mo par fichier</div>
+        </div>
+
+        <!-- Barre de progression -->
+        <div id="barre-progression" style="display:none;margin-bottom:16px;">
+          <div style="font-size:.875rem;color:var(--gris-moyen);margin-bottom:6px;">Upload en cours...</div>
+          <div class="progress-bar-wrapper">
+            <div class="progress-bar-fill" id="progression-fill"></div>
+          </div>
+        </div>
+
+        <!-- Grille médias -->
+        <div class="medias-grille" id="grille-medias">
+          <div class="chargement">Chargement des médias...</div>
+        </div>
+
+      </main>
+    </div>
+
+  </div>
+
+  <!-- MODALE APERÇU IMAGE -->
+  <div class="overlay" id="overlay-apercu">
+    <div class="modale" style="max-width:800px;background:transparent;box-shadow:none;">
+      <div style="text-align:right;margin-bottom:8px;">
+        <button class="modale__fermer" style="background:rgba(0,0,0,0.6);color:#fff;border-radius:50%;width:36px;height:36px;" aria-label="Fermer">✕</button>
+      </div>
+      <img id="apercu-image" src="" alt="Aperçu" style="width:100%;border-radius:12px;max-height:80vh;object-fit:contain;" loading="lazy">
+    </div>
+  </div>
+
+  <!-- Notifications -->
+  <div class="toast-container" id="toast-container"></div>
+
+  <script src="js/auth.js"></script>
+  <script src="js/medias.js"></script>
+
+</body>
+</html>
