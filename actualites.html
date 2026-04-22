@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Actualités | Administration SOFRETMA TRANSIT</title>
+  <meta name="robots" content="noindex, nofollow">
+  <link rel="icon" href="images/logo-sofretma-blanc.png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <!-- Quill.js éditeur de texte riche -->
+  <link href="https://cdn.quilljs.com/1.3.7/quill.snow.css" rel="stylesheet">
+  <link rel="stylesheet" href="css/admin.css">
+</head>
+<body>
+
+  <div class="admin-layout">
+
+    <!-- SIDEBAR -->
+    <aside class="sidebar">
+      <div class="sidebar__logo">
+        <picture>
+          <source srcset="images/logo-sofretma-blanc.webp" type="image/webp">
+          <img src="images/logo-sofretma-blanc.png" alt="SOFRETMA TRANSIT" width="140">
+        </picture>
+      </div>
+      <nav class="sidebar__nav">
+        <a href="dashboard.html" class="sidebar__lien">
+          <span class="icone">🏠</span> Tableau de bord
+        </a>
+        <a href="clients.html" class="sidebar__lien">
+          <span class="icone">👥</span> Clients inscrits
+        </a>
+        <a href="paiements.html" class="sidebar__lien">
+          <span class="icone">💰</span> Paiements
+        </a>
+        <a href="actualites.html" class="sidebar__lien actif">
+          <span class="icone">📰</span> Actualités
+        </a>
+        <a href="medias.html" class="sidebar__lien">
+          <span class="icone">🖼️</span> Médiathèque
+        </a>
+        <a href="formulaires.html" class="sidebar__lien">
+          <span class="icone">📋</span> Formulaires reçus
+        </a>
+        <div class="sidebar__separateur"></div>
+      </nav>
+      <div class="sidebar__footer">
+        <button class="sidebar__deconnexion" id="btn-deconnexion">
+          <span class="icone">🚪</span> Déconnexion
+        </button>
+      </div>
+    </aside>
+
+    <!-- CONTENU PRINCIPAL -->
+    <div class="contenu-principal">
+
+      <header class="topbar">
+        <div style="display:flex;align-items:center;gap:12px;">
+          <button class="hamburger-admin" id="hamburger-admin" aria-label="Menu">
+            <span></span><span></span><span></span>
+          </button>
+          <h1 class="topbar__titre">Gestion des actualités</h1>
+        </div>
+        <div class="topbar__droite">
+          <button class="btn btn--or" id="btn-nouvel-article">+ Nouvel article</button>
+        </div>
+      </header>
+
+      <main class="page-contenu">
+
+        <!-- Tableau des articles -->
+        <div class="card">
+          <div class="table-wrapper">
+            <table>
+              <thead>
+                <tr>
+                  <th>Titre</th>
+                  <th>Date publication</th>
+                  <th>Catégorie</th>
+                  <th>Statut</th>
+                  <th>Actions</th>
+                </tr>
+              </thead>
+              <tbody id="tbody-articles">
+                <tr><td colspan="5" class="chargement">Chargement des données...</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+      </main>
+    </div>
+
+  </div>
+
+  <!-- MODALE ARTICLE -->
+  <div class="overlay" id="overlay-article">
+    <div class="modale" style="max-width:720px;">
+      <div class="modale__entete">
+        <h2 class="modale__titre" id="modale-titre">Nouvel article</h2>
+        <button class="modale__fermer" aria-label="Fermer">✕</button>
+      </div>
+      <div class="modale__corps">
+        <form id="formulaire-article">
+          <div class="form-article">
+
+            <!-- Titre -->
+            <div class="form-groupe form-groupe--plein">
+              <label for="titre">Titre de l'article *</label>
+              <input type="text" id="titre" name="titre" placeholder="Titre de l'article" required>
+            </div>
+
+            <!-- Date de publication -->
+            <div class="form-groupe">
+              <label for="date_publication">Date de publication *</label>
+              <input type="date" id="date_publication" name="date_publication" required>
+            </div>
+
+            <!-- Catégorie -->
+            <div class="form-groupe">
+              <label for="categorie">Catégorie</label>
+              <select id="categorie" name="categorie">
+                <option value="Transport">Transport</option>
+                <option value="Logistique">Logistique</option>
+                <option value="Entreprise">Entreprise</option>
+                <option value="Offre spéciale">Offre spéciale</option>
+              </select>
+            </div>
+
+            <!-- Image principale -->
+            <div class="form-groupe form-groupe--plein">
+              <label for="champ-image">Image principale</label>
+              <input type="file" id="champ-image" name="image" accept="image/jpeg,image/png,image/webp">
+              <img class="image-preview" id="preview-image" alt="Aperçu image" loading="lazy">
+            </div>
+
+            <!-- Contenu riche -->
+            <div class="form-groupe form-groupe--plein">
+              <label>Contenu de l'article</label>
+              <div class="quill-wrapper">
+                <div id="editeur-contenu"></div>
+              </div>
+              <div id="quill-wrapper" style="display:none;"></div>
+            </div>
+
+            <!-- Statut -->
+            <div class="form-groupe">
+              <label for="statut">Statut</label>
+              <select id="statut" name="statut">
+                <option value="brouillon">Brouillon</option>
+                <option value="publie">Publié</option>
+              </select>
+            </div>
+
+          </div>
+
+          <div class="modale__pied" style="padding:0;margin-top:24px;">
+            <button type="button" class="btn btn--gris btn-fermer-modale">Annuler</button>
+            <button type="submit" class="btn btn--or">Enregistrer l'article</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- Notifications -->
+  <div class="toast-container" id="toast-container"></div>
+
+  <script src="https://cdn.quilljs.com/1.3.7/quill.min.js"></script>
+  <script src="js/auth.js"></script>
+  <script src="js/actualites.js"></script>
+
+</body>
+</html>
