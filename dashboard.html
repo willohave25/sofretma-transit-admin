@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Tableau de bord | Administration SOFRETMA TRANSIT</title>
+  <meta name="robots" content="noindex, nofollow">
+  <link rel="icon" href="images/logo-sofretma-blanc.png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/admin.css">
+</head>
+<body>
+
+  <div class="admin-layout">
+
+    <!-- SIDEBAR -->
+    <aside class="sidebar">
+      <div class="sidebar__logo">
+        <picture>
+          <source srcset="images/logo-sofretma-blanc.webp" type="image/webp">
+          <img src="images/logo-sofretma-blanc.png" alt="SOFRETMA TRANSIT" width="140">
+        </picture>
+      </div>
+      <nav class="sidebar__nav">
+        <a href="dashboard.html" class="sidebar__lien actif">
+          <span class="icone">🏠</span> Tableau de bord
+        </a>
+        <a href="clients.html" class="sidebar__lien">
+          <span class="icone">👥</span> Clients inscrits
+        </a>
+        <a href="paiements.html" class="sidebar__lien">
+          <span class="icone">💰</span> Paiements
+        </a>
+        <a href="actualites.html" class="sidebar__lien">
+          <span class="icone">📰</span> Actualités
+        </a>
+        <a href="medias.html" class="sidebar__lien">
+          <span class="icone">🖼️</span> Médiathèque
+        </a>
+        <a href="formulaires.html" class="sidebar__lien">
+          <span class="icone">📋</span> Formulaires reçus
+        </a>
+        <div class="sidebar__separateur"></div>
+      </nav>
+      <div class="sidebar__footer">
+        <button class="sidebar__deconnexion" id="btn-deconnexion">
+          <span class="icone">🚪</span> Déconnexion
+        </button>
+      </div>
+    </aside>
+
+    <!-- CONTENU PRINCIPAL -->
+    <div class="contenu-principal">
+
+      <!-- Topbar -->
+      <header class="topbar">
+        <div style="display:flex;align-items:center;gap:12px;">
+          <button class="hamburger-admin" id="hamburger-admin" aria-label="Menu">
+            <span></span><span></span><span></span>
+          </button>
+          <h1 class="topbar__titre">Tableau de bord</h1>
+        </div>
+        <div class="topbar__droite">
+          <span class="topbar__admin">Bonjour, <strong>Administrateur</strong></span>
+        </div>
+      </header>
+
+      <!-- Contenu -->
+      <main class="page-contenu">
+
+        <!-- ============================================================
+             CARTES STATISTIQUES — LIGNE 1 : Activité générale
+        ============================================================ -->
+        <div class="stats-grille">
+          <div class="stat-card stat-card--vert">
+            <div class="stat-card__icone">👥</div>
+            <div class="stat-card__valeur" id="stat-clients">—</div>
+            <div class="stat-card__label">Clients inscrits</div>
+          </div>
+          <div class="stat-card stat-card--bleu">
+            <div class="stat-card__icone">✅</div>
+            <div class="stat-card__valeur" id="stat-actifs">—</div>
+            <div class="stat-card__label">Clients actifs</div>
+          </div>
+          <div class="stat-card stat-card--or">
+            <div class="stat-card__icone">📰</div>
+            <div class="stat-card__valeur" id="stat-articles">—</div>
+            <div class="stat-card__label">Articles publiés</div>
+          </div>
+          <div class="stat-card stat-card--rouge">
+            <div class="stat-card__icone">📋</div>
+            <div class="stat-card__valeur" id="stat-formulaires">—</div>
+            <div class="stat-card__label">Formulaires reçus</div>
+          </div>
+        </div>
+
+        <!-- ============================================================
+             CARTES STATISTIQUES — LIGNE 2 : Paiements
+        ============================================================ -->
+        <div class="stats-grille" style="margin-bottom:32px;">
+          <div class="stat-card stat-card--vert">
+            <div class="stat-card__icone">💸</div>
+            <div class="stat-card__valeur" id="stat-paiements-recus">—</div>
+            <div class="stat-card__label">Paiements reçus</div>
+          </div>
+          <div class="stat-card stat-card--or">
+            <div class="stat-card__icone">⏳</div>
+            <div class="stat-card__valeur" id="stat-paiements-attente">—</div>
+            <div class="stat-card__label">Paiements en attente</div>
+          </div>
+          <div class="stat-card stat-card--bleu" style="grid-column:span 2;">
+            <div class="stat-card__icone">💰</div>
+            <div class="stat-card__valeur" id="stat-montant-total">—</div>
+            <div class="stat-card__label">Montant total encaissé</div>
+          </div>
+        </div>
+
+        <!-- ============================================================
+             PAIEMENTS EN ATTENTE
+        ============================================================ -->
+        <div class="card" style="margin-bottom:24px;">
+          <div class="card__entete">
+            <h2 class="card__titre">⏳ Paiements en attente</h2>
+            <a href="paiements.html" class="btn btn--sm btn--or">Voir tout</a>
+          </div>
+          <div class="card__corps">
+            <div id="liste-paiements-attente">
+              <div class="chargement">Chargement des données...</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- ============================================================
+             PAIEMENTS REÇUS
+        ============================================================ -->
+        <div class="card" style="margin-bottom:24px;">
+          <div class="card__entete">
+            <h2 class="card__titre">✅ Paiements reçus</h2>
+            <a href="paiements.html" class="btn btn--sm btn--vert">Voir tout</a>
+          </div>
+          <div class="card__corps">
+            <div id="liste-paiements-recus">
+              <div class="chargement">Chargement des données...</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- ============================================================
+             ACTIVITÉ RÉCENTE — Grille 3 colonnes
+        ============================================================ -->
+        <div class="dashboard-grille">
+
+          <!-- Derniers clients -->
+          <div class="card">
+            <div class="card__entete">
+              <h2 class="card__titre">Derniers clients inscrits</h2>
+              <a href="clients.html" class="btn btn--sm btn--gris">Voir tout</a>
+            </div>
+            <div class="card__corps activite-liste" id="liste-derniers-clients">
+              <div class="chargement">Chargement des données...</div>
+            </div>
+          </div>
+
+          <!-- Derniers formulaires -->
+          <div class="card">
+            <div class="card__entete">
+              <h2 class="card__titre">Derniers formulaires reçus</h2>
+              <a href="formulaires.html" class="btn btn--sm btn--gris">Voir tout</a>
+            </div>
+            <div class="card__corps activite-liste" id="liste-derniers-formulaires">
+              <div class="chargement">Chargement des données...</div>
+            </div>
+          </div>
+
+        </div>
+
+        <!-- ============================================================
+             ACTIONS RAPIDES + DERNIERS ARTICLES
+        ============================================================ -->
+        <div class="dashboard-grille">
+
+          <!-- Actions rapides -->
+          <div>
+            <div class="section-entete">
+              <h2 class="section-entete__titre">Actions rapides</h2>
+            </div>
+            <div class="actions-rapides">
+              <a href="actualites.html" class="action-rapide">
+                <span class="action-rapide__icone">📝</span>
+                <span class="action-rapide__label">Nouvel article</span>
+              </a>
+              <a href="formulaires.html" class="action-rapide">
+                <span class="action-rapide__icone">📋</span>
+                <span class="action-rapide__label">Voir formulaires</span>
+              </a>
+              <a href="paiements.html" class="action-rapide">
+                <span class="action-rapide__icone">💰</span>
+                <span class="action-rapide__label">Gérer paiements</span>
+              </a>
+              <a href="medias.html" class="action-rapide">
+                <span class="action-rapide__icone">📤</span>
+                <span class="action-rapide__label">Uploader médias</span>
+              </a>
+            </div>
+          </div>
+
+          <!-- Derniers articles -->
+          <div class="card">
+            <div class="card__entete">
+              <h2 class="card__titre">Derniers articles</h2>
+              <a href="actualites.html" class="btn btn--sm btn--gris">Gérer</a>
+            </div>
+            <div class="card__corps activite-liste" id="liste-derniers-articles">
+              <div class="chargement">Chargement des données...</div>
+            </div>
+          </div>
+
+        </div>
+
+      </main>
+    </div><!-- fin contenu-principal -->
+
+  </div><!-- fin admin-layout -->
+
+  <!-- Notifications -->
+  <div class="toast-container" id="toast-container"></div>
+
+  <script src="js/auth.js"></script>
+  <script src="js/dashboard.js"></script>
+
+</body>
+</html>
