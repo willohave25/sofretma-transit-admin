@@ -1,0 +1,308 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Expéditions | Administration SOFRETMA TRANSIT</title>
+  <meta name="robots" content="noindex, nofollow">
+  <link rel="icon" href="images/logo-sofretma-blanc.png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/admin.css">
+</head>
+<body>
+
+  <div class="admin-layout">
+
+    <!-- SIDEBAR -->
+    <aside class="sidebar">
+      <div class="sidebar__logo">
+        <picture>
+          <source srcset="images/logo-sofretma-blanc.webp" type="image/webp">
+          <img src="images/logo-sofretma-blanc.png" alt="SOFRETMA TRANSIT" width="140">
+        </picture>
+      </div>
+      <nav class="sidebar__nav">
+        <a href="dashboard.html" class="sidebar__lien">
+          <span class="icone">🏠</span> Tableau de bord
+        </a>
+        <a href="clients.html" class="sidebar__lien">
+          <span class="icone">👥</span> Clients inscrits
+        </a>
+        <a href="paiements.html" class="sidebar__lien">
+          <span class="icone">💰</span> Paiements
+        </a>
+        <a href="expeditions.html" class="sidebar__lien actif">
+          <span class="icone">🚢</span> Expéditions
+        </a>
+        <a href="conteneurs.html" class="sidebar__lien">
+          <span class="icone">📦</span> Conteneurs
+        </a>
+        <a href="stockage.html" class="sidebar__lien">
+          <span class="icone">🏭</span> Stockage & Entreposage
+        </a>
+        <a href="actualites.html" class="sidebar__lien">
+          <span class="icone">📰</span> Actualités
+        </a>
+        <a href="medias.html" class="sidebar__lien">
+          <span class="icone">🖼️</span> Médiathèque
+        </a>
+        <a href="formulaires.html" class="sidebar__lien">
+          <span class="icone">📋</span> Formulaires reçus
+        </a>
+        <div class="sidebar__separateur"></div>
+      </nav>
+      <div class="sidebar__footer">
+        <button class="sidebar__deconnexion" id="btn-deconnexion">
+          <span class="icone">🚪</span> Déconnexion
+        </button>
+      </div>
+    </aside>
+
+    <!-- CONTENU PRINCIPAL -->
+    <div class="contenu-principal">
+
+      <header class="topbar">
+        <div style="display:flex;align-items:center;gap:12px;">
+          <button class="hamburger-admin" id="hamburger-admin" aria-label="Menu">
+            <span></span><span></span><span></span>
+          </button>
+          <h1 class="topbar__titre">Gestion des expéditions</h1>
+        </div>
+        <div class="topbar__droite">
+          <button class="btn btn--gris btn--sm" id="btn-export-exp">⬇ Export CSV</button>
+          <button class="btn btn--or" id="btn-nouvelle-exp">+ Nouvelle expédition</button>
+        </div>
+      </header>
+
+      <main class="page-contenu">
+
+        <!-- Compteurs -->
+        <div class="stats-grille" style="margin-bottom:24px;">
+          <div class="stat-card stat-card--bleu">
+            <div class="stat-card__icone">🚢</div>
+            <div class="stat-card__valeur" id="compteur-exp-total">—</div>
+            <div class="stat-card__label">Total expéditions</div>
+          </div>
+          <div class="stat-card stat-card--or">
+            <div class="stat-card__icone">🔄</div>
+            <div class="stat-card__valeur" id="compteur-exp-transit">—</div>
+            <div class="stat-card__label">En transit</div>
+          </div>
+          <div class="stat-card stat-card--rouge">
+            <div class="stat-card__icone">🔍</div>
+            <div class="stat-card__valeur" id="compteur-exp-douane">—</div>
+            <div class="stat-card__label">En douane</div>
+          </div>
+          <div class="stat-card stat-card--vert">
+            <div class="stat-card__icone">🏁</div>
+            <div class="stat-card__valeur" id="compteur-exp-livres">—</div>
+            <div class="stat-card__label">Livrées</div>
+          </div>
+        </div>
+
+        <!-- Barre d'outils -->
+        <div class="barre-outils">
+          <div class="barre-outils__recherche">
+            <input type="text" id="recherche-exp" placeholder="Référence, code client, ville...">
+          </div>
+          <select id="filtre-transport">
+            <option value="">Tous les transports</option>
+            <option value="Maritime">🚢 Maritime</option>
+            <option value="Aérien">✈️ Aérien</option>
+            <option value="Terrestre">🚛 Terrestre</option>
+            <option value="Ferroviaire">🚂 Ferroviaire</option>
+          </select>
+          <select id="filtre-statut-exp">
+            <option value="">Tous les statuts</option>
+            <option value="en_preparation">En préparation</option>
+            <option value="en_transit">En transit</option>
+            <option value="en_douane">En douane</option>
+            <option value="livre">Livré</option>
+            <option value="bloque">Bloqué</option>
+          </select>
+        </div>
+
+        <!-- Tableau expéditions -->
+        <div class="card">
+          <div class="table-wrapper">
+            <table>
+              <thead>
+                <tr>
+                  <th>Référence</th>
+                  <th>Code client</th>
+                  <th>Client</th>
+                  <th>Type de colis</th>
+                  <th>Trajet</th>
+                  <th>Transport</th>
+                  <th>Statut</th>
+                  <th>Dédouanement</th>
+                  <th>Actions</th>
+                </tr>
+              </thead>
+              <tbody id="tbody-expeditions">
+                <tr><td colspan="9" class="chargement">Chargement des données...</td></tr>
+              </tbody>
+            </table>
+          </div>
+          <div class="pagination">
+            <span class="pagination__info" id="info-pagination"></span>
+          </div>
+        </div>
+
+      </main>
+    </div>
+
+  </div>
+
+  <!-- MODALE SUIVI EXPÉDITION (stepper dédouanement) -->
+  <div class="overlay" id="overlay-suivi">
+    <div class="modale" style="max-width:720px;">
+      <div class="modale__entete">
+        <h2 class="modale__titre">Suivi de l'expédition</h2>
+        <button class="modale__fermer" aria-label="Fermer">✕</button>
+      </div>
+      <div class="modale__corps" id="suivi-corps"></div>
+      <div class="modale__pied">
+        <button class="btn btn--gris btn-fermer-modale">Fermer</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODALE FORMULAIRE EXPÉDITION -->
+  <div class="overlay" id="overlay-exp-form">
+    <div class="modale" style="max-width:680px;">
+      <div class="modale__entete">
+        <h2 class="modale__titre" id="modale-exp-titre">Nouvelle expédition</h2>
+        <button class="modale__fermer" aria-label="Fermer">✕</button>
+      </div>
+      <div class="modale__corps">
+        <form id="formulaire-expedition">
+          <div class="form-article">
+
+            <div class="form-groupe">
+              <label for="exp-reference">Référence *</label>
+              <input type="text" id="exp-reference" name="reference" placeholder="Ex: EXP-2025-001" required>
+            </div>
+
+            <div class="form-groupe">
+              <label for="exp-code-client">Code client *</label>
+              <input type="text" id="exp-code-client" name="code_client" placeholder="Ex: CLT-0042" required>
+            </div>
+
+            <div class="form-groupe form-groupe--plein">
+              <label for="exp-client-nom">Nom du client *</label>
+              <input type="text" id="exp-client-nom" name="client_nom" placeholder="Nom complet" required>
+            </div>
+
+            <div class="form-groupe">
+              <label for="exp-type-colis">Type de colis *</label>
+              <select id="exp-type-colis" name="type_colis" required>
+                <option value="">Sélectionner...</option>
+                <option value="Colis standard">Colis standard</option>
+                <option value="Marchandise vrac">Marchandise vrac</option>
+                <option value="Matériel industriel">Matériel industriel</option>
+                <option value="Véhicule">Véhicule</option>
+                <option value="Denrées alimentaires">Denrées alimentaires</option>
+                <option value="Matières dangereuses">Matières dangereuses</option>
+                <option value="Textile / Confection">Textile / Confection</option>
+                <option value="Électronique">Électronique</option>
+                <option value="Autre">Autre</option>
+              </select>
+            </div>
+
+            <div class="form-groupe">
+              <label for="exp-type-transport">Type de transport *</label>
+              <select id="exp-type-transport" name="type_transport" required>
+                <option value="Maritime">🚢 Maritime</option>
+                <option value="Aérien">✈️ Aérien</option>
+                <option value="Terrestre">🚛 Terrestre</option>
+                <option value="Ferroviaire">🚂 Ferroviaire</option>
+              </select>
+            </div>
+
+            <div class="form-groupe">
+              <label for="exp-description">Description du colis</label>
+              <input type="text" id="exp-description" name="description_colis" placeholder="Description brève">
+            </div>
+
+            <div class="form-groupe">
+              <label for="exp-poids">Poids (kg)</label>
+              <input type="number" id="exp-poids" name="poids" placeholder="0" min="0" step="0.1">
+            </div>
+
+            <div class="form-groupe">
+              <label for="exp-volume">Volume (m³)</label>
+              <input type="number" id="exp-volume" name="volume" placeholder="0" min="0" step="0.01">
+            </div>
+
+            <div class="form-groupe">
+              <label for="exp-ville-depart">Ville de départ *</label>
+              <input type="text" id="exp-ville-depart" name="ville_depart" placeholder="Ex: Abidjan" required>
+            </div>
+
+            <div class="form-groupe">
+              <label for="exp-ville-arrivee">Ville d'arrivée *</label>
+              <input type="text" id="exp-ville-arrivee" name="ville_arrivee" placeholder="Ex: Paris" required>
+            </div>
+
+            <div class="form-groupe">
+              <label for="exp-date-depart">Date de départ prévue</label>
+              <input type="date" id="exp-date-depart" name="date_depart_prevu">
+            </div>
+
+            <div class="form-groupe">
+              <label for="exp-date-arrivee">Date d'arrivée prévue</label>
+              <input type="date" id="exp-date-arrivee" name="date_arrivee_prevue">
+            </div>
+
+            <div class="form-groupe">
+              <label for="exp-statut">Statut</label>
+              <select id="exp-statut" name="statut">
+                <option value="en_preparation">En préparation</option>
+                <option value="en_transit">En transit</option>
+                <option value="en_douane">En douane</option>
+                <option value="livre">Livré</option>
+                <option value="bloque">Bloqué</option>
+              </select>
+            </div>
+
+            <div class="form-groupe">
+              <label for="exp-etape">Étape dédouanement</label>
+              <select id="exp-etape" name="etape_courante">
+                <option value="prise_en_charge">1. Prise en charge</option>
+                <option value="depart">2. Départ</option>
+                <option value="en_transit">3. En transit</option>
+                <option value="arrivee_port">4. Arrivée port</option>
+                <option value="declaration">5. Déclaration douane</option>
+                <option value="verification">6. Vérification</option>
+                <option value="validation_douane">7. Validation douane</option>
+                <option value="livraison">8. Livraison finale</option>
+              </select>
+            </div>
+
+            <div class="form-groupe form-groupe--plein">
+              <label for="exp-notes">Notes</label>
+              <textarea id="exp-notes" name="notes" placeholder="Notes internes..."></textarea>
+            </div>
+
+          </div>
+
+          <div class="modale__pied" style="padding:0;margin-top:24px;">
+            <button type="button" class="btn btn--gris btn-fermer-modale">Annuler</button>
+            <button type="submit" class="btn btn--or">Enregistrer</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- Notifications -->
+  <div class="toast-container" id="toast-container"></div>
+
+  <script src="js/auth.js"></script>
+  <script src="js/expeditions.js"></script>
+
+</body>
+</html>
