@@ -1,0 +1,282 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Conteneurs | Administration SOFRETMA TRANSIT</title>
+  <meta name="robots" content="noindex, nofollow">
+  <link rel="icon" href="images/logo-sofretma-blanc.png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/admin.css">
+</head>
+<body>
+
+  <div class="admin-layout">
+
+    <!-- SIDEBAR -->
+    <aside class="sidebar">
+      <div class="sidebar__logo">
+        <picture>
+          <source srcset="images/logo-sofretma-blanc.webp" type="image/webp">
+          <img src="images/logo-sofretma-blanc.png" alt="SOFRETMA TRANSIT" width="140">
+        </picture>
+      </div>
+      <nav class="sidebar__nav">
+        <a href="dashboard.html" class="sidebar__lien">
+          <span class="icone">🏠</span> Tableau de bord
+        </a>
+        <a href="clients.html" class="sidebar__lien">
+          <span class="icone">👥</span> Clients inscrits
+        </a>
+        <a href="paiements.html" class="sidebar__lien">
+          <span class="icone">💰</span> Paiements
+        </a>
+        <a href="expeditions.html" class="sidebar__lien">
+          <span class="icone">🚢</span> Expéditions
+        </a>
+        <a href="conteneurs.html" class="sidebar__lien actif">
+          <span class="icone">📦</span> Conteneurs
+        </a>
+        <a href="stockage.html" class="sidebar__lien">
+          <span class="icone">🏭</span> Stockage & Entreposage
+        </a>
+        <a href="actualites.html" class="sidebar__lien">
+          <span class="icone">📰</span> Actualités
+        </a>
+        <a href="medias.html" class="sidebar__lien">
+          <span class="icone">🖼️</span> Médiathèque
+        </a>
+        <a href="formulaires.html" class="sidebar__lien">
+          <span class="icone">📋</span> Formulaires reçus
+        </a>
+        <div class="sidebar__separateur"></div>
+      </nav>
+      <div class="sidebar__footer">
+        <button class="sidebar__deconnexion" id="btn-deconnexion">
+          <span class="icone">🚪</span> Déconnexion
+        </button>
+      </div>
+    </aside>
+
+    <!-- CONTENU PRINCIPAL -->
+    <div class="contenu-principal">
+
+      <header class="topbar">
+        <div style="display:flex;align-items:center;gap:12px;">
+          <button class="hamburger-admin" id="hamburger-admin" aria-label="Menu">
+            <span></span><span></span><span></span>
+          </button>
+          <h1 class="topbar__titre">Gestion des conteneurs</h1>
+        </div>
+        <div class="topbar__droite">
+          <button class="btn btn--gris btn--sm" id="btn-export-cont">⬇ Export CSV</button>
+          <button class="btn btn--or" id="btn-nouveau-cont">+ Nouveau conteneur</button>
+        </div>
+      </header>
+
+      <main class="page-contenu">
+
+        <!-- Compteurs -->
+        <div class="stats-grille" style="margin-bottom:24px;">
+          <div class="stat-card stat-card--bleu">
+            <div class="stat-card__icone">📦</div>
+            <div class="stat-card__valeur" id="compteur-cont-total">—</div>
+            <div class="stat-card__label">Total conteneurs</div>
+          </div>
+          <div class="stat-card stat-card--or">
+            <div class="stat-card__icone">🔄</div>
+            <div class="stat-card__valeur" id="compteur-cont-transit">—</div>
+            <div class="stat-card__label">En transit</div>
+          </div>
+          <div class="stat-card stat-card--rouge">
+            <div class="stat-card__icone">🔍</div>
+            <div class="stat-card__valeur" id="compteur-cont-douane">—</div>
+            <div class="stat-card__label">En douane</div>
+          </div>
+          <div class="stat-card stat-card--vert">
+            <div class="stat-card__icone">✓</div>
+            <div class="stat-card__valeur" id="compteur-cont-disponible">—</div>
+            <div class="stat-card__label">Disponibles</div>
+          </div>
+        </div>
+
+        <!-- Barre d'outils -->
+        <div class="barre-outils">
+          <div class="barre-outils__recherche">
+            <input type="text" id="recherche-cont" placeholder="N° conteneur, port, compagnie...">
+          </div>
+          <select id="filtre-type-cont">
+            <option value="">FCL et LCL</option>
+            <option value="FCL">FCL (Conteneur complet)</option>
+            <option value="LCL">LCL (Groupage)</option>
+          </select>
+          <select id="filtre-statut-cont">
+            <option value="">Tous les statuts</option>
+            <option value="disponible">Disponible</option>
+            <option value="en_chargement">En chargement</option>
+            <option value="en_transit">En transit</option>
+            <option value="en_decharge">Déchargement</option>
+            <option value="en_douane">En douane</option>
+            <option value="livre">Livré</option>
+            <option value="bloque">Bloqué</option>
+          </select>
+        </div>
+
+        <!-- Tableau conteneurs -->
+        <div class="card">
+          <div class="table-wrapper">
+            <table>
+              <thead>
+                <tr>
+                  <th>N° conteneur</th>
+                  <th>Type</th>
+                  <th>Taille</th>
+                  <th>Port départ</th>
+                  <th>Port arrivée</th>
+                  <th>Compagnie</th>
+                  <th>Départ</th>
+                  <th>Arrivée prévue</th>
+                  <th>Remplissage</th>
+                  <th>Statut</th>
+                  <th>Actions</th>
+                </tr>
+              </thead>
+              <tbody id="tbody-conteneurs">
+                <tr><td colspan="11" class="chargement">Chargement des données...</td></tr>
+              </tbody>
+            </table>
+          </div>
+          <div class="pagination">
+            <span class="pagination__info" id="info-pagination"></span>
+          </div>
+        </div>
+
+      </main>
+    </div>
+
+  </div>
+
+  <!-- MODALE DÉTAIL CONTENEUR -->
+  <div class="overlay" id="overlay-detail-cont">
+    <div class="modale" style="max-width:600px;">
+      <div class="modale__entete">
+        <h2 class="modale__titre">Détails du conteneur</h2>
+        <button class="modale__fermer" aria-label="Fermer">✕</button>
+      </div>
+      <div class="modale__corps" id="detail-cont-corps"></div>
+      <div class="modale__pied">
+        <button class="btn btn--gris btn-fermer-modale">Fermer</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODALE FORMULAIRE CONTENEUR -->
+  <div class="overlay" id="overlay-cont-form">
+    <div class="modale" style="max-width:640px;">
+      <div class="modale__entete">
+        <h2 class="modale__titre" id="modale-cont-titre">Nouveau conteneur</h2>
+        <button class="modale__fermer" aria-label="Fermer">✕</button>
+      </div>
+      <div class="modale__corps">
+        <form id="formulaire-conteneur">
+          <div class="form-article">
+
+            <div class="form-groupe">
+              <label for="cont-numero">N° de conteneur *</label>
+              <input type="text" id="cont-numero" name="numero" placeholder="Ex: MSCU1234567" required>
+            </div>
+
+            <div class="form-groupe">
+              <label for="cont-type">Type *</label>
+              <select id="cont-type" name="type" required>
+                <option value="FCL">FCL — Conteneur complet</option>
+                <option value="LCL">LCL — Groupage</option>
+              </select>
+            </div>
+
+            <div class="form-groupe">
+              <label for="cont-taille">Taille</label>
+              <select id="cont-taille" name="taille">
+                <option value="20 pieds">20 pieds</option>
+                <option value="40 pieds">40 pieds</option>
+                <option value="40 pieds HC">40 pieds HC (High Cube)</option>
+                <option value="45 pieds">45 pieds</option>
+                <option value="Réfrigéré 20p">Réfrigéré 20 pieds</option>
+                <option value="Réfrigéré 40p">Réfrigéré 40 pieds</option>
+              </select>
+            </div>
+
+            <div class="form-groupe">
+              <label for="cont-remplissage">Remplissage (%)</label>
+              <input type="number" id="cont-remplissage" name="remplissage" placeholder="0" min="0" max="100">
+            </div>
+
+            <div class="form-groupe">
+              <label for="cont-port-depart">Port de départ *</label>
+              <input type="text" id="cont-port-depart" name="port_depart" placeholder="Ex: Port d'Abidjan" required>
+            </div>
+
+            <div class="form-groupe">
+              <label for="cont-port-arrivee">Port d'arrivée *</label>
+              <input type="text" id="cont-port-arrivee" name="port_arrivee" placeholder="Ex: Port du Havre" required>
+            </div>
+
+            <div class="form-groupe">
+              <label for="cont-compagnie">Compagnie maritime</label>
+              <input type="text" id="cont-compagnie" name="compagnie" placeholder="Ex: MSC, CMA CGM...">
+            </div>
+
+            <div class="form-groupe">
+              <label for="cont-numero-bl">N° connaissement (BL)</label>
+              <input type="text" id="cont-numero-bl" name="numero_bl" placeholder="Ex: MSCUAB123456">
+            </div>
+
+            <div class="form-groupe">
+              <label for="cont-date-depart">Date de départ</label>
+              <input type="date" id="cont-date-depart" name="date_depart">
+            </div>
+
+            <div class="form-groupe">
+              <label for="cont-date-arrivee">Arrivée prévue</label>
+              <input type="date" id="cont-date-arrivee" name="date_arrivee_prevue">
+            </div>
+
+            <div class="form-groupe form-groupe--plein">
+              <label for="cont-statut">Statut</label>
+              <select id="cont-statut" name="statut">
+                <option value="disponible">Disponible</option>
+                <option value="en_chargement">En chargement</option>
+                <option value="en_transit">En transit</option>
+                <option value="en_decharge">Déchargement</option>
+                <option value="en_douane">En douane</option>
+                <option value="livre">Livré</option>
+                <option value="bloque">Bloqué</option>
+              </select>
+            </div>
+
+            <div class="form-groupe form-groupe--plein">
+              <label for="cont-notes">Notes</label>
+              <textarea id="cont-notes" name="notes" placeholder="Notes internes..."></textarea>
+            </div>
+
+          </div>
+
+          <div class="modale__pied" style="padding:0;margin-top:24px;">
+            <button type="button" class="btn btn--gris btn-fermer-modale">Annuler</button>
+            <button type="submit" class="btn btn--or">Enregistrer</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- Notifications -->
+  <div class="toast-container" id="toast-container"></div>
+
+  <script src="js/auth.js"></script>
+  <script src="js/conteneurs.js"></script>
+
+</body>
+</html>
