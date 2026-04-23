@@ -1,316 +1,277 @@
-/* ============================================================
-   SOFRETMA TRANSIT — Gestion des paiements
-   W2K-Digital | paiements.js
-   ============================================================ */
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Paiements | Administration SOFRETMA TRANSIT</title>
+  <meta name="robots" content="noindex, nofollow">
+  <link rel="icon" href="images/logo-sofretma-blanc.png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/admin.css">
+</head>
+<body>
 
-document.addEventListener('DOMContentLoaded', function () {
+  <div class="admin-layout">
 
-  if (!window.SofretmaAuth || !window.SofretmaAuth.protegerPage()) return;
+    <!-- SIDEBAR -->
+    <aside class="sidebar">
+      <div class="sidebar__logo">
+        <picture>
+          <source srcset="images/logo-sofretma-blanc.webp" type="image/webp">
+          <img src="images/logo-sofretma-blanc.png" alt="SOFRETMA TRANSIT" width="140">
+        </picture>
+      </div>
+      <nav class="sidebar__nav">
+        <a href="dashboard.html" class="sidebar__lien">
+          <span class="icone">🏠</span> Tableau de bord
+        </a>
+        <a href="clients.html" class="sidebar__lien">
+          <span class="icone">👥</span> Clients inscrits
+        </a>
+        <a href="paiements.html" class="sidebar__lien actif">
+          <span class="icone">💰</span> Paiements
+        </a>
+        <a href="expeditions.html" class="sidebar__lien">
+          <span class="icone">🚢</span> Expéditions
+        </a>
+        <a href="conteneurs.html" class="sidebar__lien">
+          <span class="icone">📦</span> Conteneurs
+        </a>
+        <a href="stockage.html" class="sidebar__lien">
+          <span class="icone">🏭</span> Stockage & Entreposage
+        </a>
+        <a href="actualites.html" class="sidebar__lien">
+          <span class="icone">📰</span> Actualités
+        </a>
+        <a href="medias.html" class="sidebar__lien">
+          <span class="icone">🖼️</span> Médiathèque
+        </a>
+        <a href="formulaires.html" class="sidebar__lien">
+          <span class="icone">📋</span> Formulaires reçus
+        </a>
+        <div class="sidebar__separateur"></div>
+      </nav>
+      <div class="sidebar__footer">
+        <button class="sidebar__deconnexion" id="btn-deconnexion">
+          <span class="icone">🚪</span> Déconnexion
+        </button>
+      </div>
+    </aside>
 
-  const API = 'http://81.17.101.202/api';
-  let tousPaiements = [];
-  let paiementEnCours = null;
-  let pageActuelle = 1;
-  const parPage = 15;
+    <!-- CONTENU PRINCIPAL -->
+    <div class="contenu-principal">
 
-  /* ---- Utilitaires ---- */
-  function escHtml(str) {
-    if (!str) return '';
-    return String(str).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
-  }
+      <header class="topbar">
+        <div style="display:flex;align-items:center;gap:12px;">
+          <button class="hamburger-admin" id="hamburger-admin" aria-label="Menu">
+            <span></span><span></span><span></span>
+          </button>
+          <h1 class="topbar__titre">Gestion des paiements</h1>
+        </div>
+        <div class="topbar__droite">
+          <button class="btn btn--gris btn--sm" id="btn-export-paiements">⬇ Export CSV</button>
+          <button class="btn btn--or" id="btn-nouveau-paiement">+ Nouveau paiement</button>
+        </div>
+      </header>
 
-  function formaterDate(str) {
-    if (!str) return '—';
-    return new Date(str).toLocaleDateString('fr-FR', { day: '2-digit', month: 'short', year: 'numeric' });
-  }
+      <main class="page-contenu">
 
-  function formaterMontant(valeur) {
-    if (valeur === null || valeur === undefined || valeur === '') return '—';
-    return parseInt(valeur, 10).toLocaleString('fr-FR') + ' FCFA';
-  }
+        <!-- Résumé financier -->
+        <div class="stats-grille" style="margin-bottom:24px;">
+          <div class="stat-card stat-card--vert">
+            <div class="stat-card__icone">✅</div>
+            <div class="stat-card__valeur" id="nb-paiements-recus">—</div>
+            <div class="stat-card__label">Paiements reçus</div>
+          </div>
+          <div class="stat-card stat-card--or">
+            <div class="stat-card__icone">⏳</div>
+            <div class="stat-card__valeur" id="nb-paiements-attente">—</div>
+            <div class="stat-card__label">En attente</div>
+          </div>
+          <div class="stat-card stat-card--vert">
+            <div class="stat-card__icone">💸</div>
+            <div class="stat-card__valeur" id="montant-recus" style="font-size:1.1rem;">—</div>
+            <div class="stat-card__label">Montant encaissé</div>
+          </div>
+          <div class="stat-card stat-card--bleu">
+            <div class="stat-card__icone">💰</div>
+            <div class="stat-card__valeur" id="montant-total" style="font-size:1.1rem;">—</div>
+            <div class="stat-card__label">Total (reçu + attente)</div>
+          </div>
+        </div>
 
-  function afficherToast(msg, type) {
-    const container = document.getElementById('toast-container');
-    if (!container) return;
-    const toast = document.createElement('div');
-    toast.className = 'toast toast--' + (type || 'succes');
-    toast.textContent = msg;
-    container.appendChild(toast);
-    setTimeout(function () { toast.remove(); }, 3500);
-  }
+        <!-- Résumé montant en attente -->
+        <div class="card" style="margin-bottom:24px;background:linear-gradient(135deg,#fff8e6,#fff);border-left:4px solid var(--or);">
+          <div style="padding:16px 20px;display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap;">
+            <div>
+              <div style="font-size:.8125rem;font-weight:600;color:var(--or);text-transform:uppercase;letter-spacing:.04em;margin-bottom:4px;">⏳ Montant en attente de règlement</div>
+              <div style="font-size:1.5rem;font-weight:700;color:var(--noir-texte);" id="montant-attente">—</div>
+            </div>
+            <a href="#section-attente" style="color:var(--or);font-size:.875rem;font-weight:600;">Voir les factures en attente →</a>
+          </div>
+        </div>
 
-  /* ---- Chargement des paiements ---- */
-  function chargerPaiements() {
-    const tbody = document.getElementById('tbody-paiements');
-    if (tbody) tbody.innerHTML = '<tr><td colspan="8" class="chargement">Chargement des données...</td></tr>';
+        <!-- Barre d'outils -->
+        <div class="barre-outils">
+          <div class="barre-outils__recherche">
+            <input type="text" id="recherche-paiements" placeholder="Rechercher par client ou référence...">
+          </div>
+          <select id="filtre-statut-paiement">
+            <option value="">Tous les statuts</option>
+            <option value="recu">Reçus</option>
+            <option value="attente">En attente</option>
+            <option value="annule">Annulés</option>
+          </select>
+          <select id="filtre-service">
+            <option value="">Tous les services</option>
+            <option value="Maritime">Maritime</option>
+            <option value="Aérien">Aérien</option>
+            <option value="Ferroviaire">Ferroviaire</option>
+            <option value="Terrestre">Terrestre</option>
+            <option value="Bureau d'achats">Bureau d'achats</option>
+            <option value="Voyages">Voyages</option>
+            <option value="Assurances">Assurances</option>
+          </select>
+        </div>
 
-    fetch(API + '/paiements')
-      .then(function (r) { return r.json(); })
-      .then(function (data) {
-        tousPaiements = (data && data.paiements) ? data.paiements : [];
-        appliquerFiltres();
-        mettreAJourResume();
-      })
-      .catch(function () {
-        tousPaiements = [];
-        appliquerFiltres();
-        mettreAJourResume();
-      });
-  }
+        <!-- Tableau paiements -->
+        <div class="card" id="section-attente">
+          <div class="table-wrapper">
+            <table>
+              <thead>
+                <tr>
+                  <th>Référence</th>
+                  <th>Client</th>
+                  <th>Service</th>
+                  <th>Montant</th>
+                  <th>Date échéance</th>
+                  <th>Date paiement</th>
+                  <th>Statut</th>
+                  <th>Actions</th>
+                </tr>
+              </thead>
+              <tbody id="tbody-paiements">
+                <tr><td colspan="8" class="chargement">Chargement des données...</td></tr>
+              </tbody>
+            </table>
+          </div>
+          <div class="pagination">
+            <span class="pagination__info" id="info-pagination"></span>
+          </div>
+        </div>
 
-  /* ---- Résumé financier ---- */
-  function mettreAJourResume() {
-    const recus   = tousPaiements.filter(function (p) { return p.statut === 'recu'; });
-    const attente = tousPaiements.filter(function (p) { return p.statut === 'attente'; });
+      </main>
+    </div>
 
-    const montantRecu   = recus.reduce(function (s, p) { return s + (parseInt(p.montant, 10) || 0); }, 0);
-    const montantAttente = attente.reduce(function (s, p) { return s + (parseInt(p.montant, 10) || 0); }, 0);
+  </div>
 
-    const elNbRecus      = document.getElementById('nb-paiements-recus');
-    const elNbAttente    = document.getElementById('nb-paiements-attente');
-    const elMontantRecu  = document.getElementById('montant-recus');
-    const elMontantAtt   = document.getElementById('montant-attente');
-    const elMontantTotal = document.getElementById('montant-total');
+  <!-- MODALE DÉTAIL PAIEMENT -->
+  <div class="overlay" id="overlay-detail-paiement">
+    <div class="modale">
+      <div class="modale__entete">
+        <h2 class="modale__titre">Détails du paiement</h2>
+        <button class="modale__fermer" aria-label="Fermer">✕</button>
+      </div>
+      <div class="modale__corps" id="detail-paiement-corps"></div>
+      <div class="modale__pied">
+        <button class="btn btn--gris btn-fermer-modale">Fermer</button>
+      </div>
+    </div>
+  </div>
 
-    if (elNbRecus)      elNbRecus.textContent      = recus.length;
-    if (elNbAttente)    elNbAttente.textContent     = attente.length;
-    if (elMontantRecu)  elMontantRecu.textContent   = formaterMontant(montantRecu);
-    if (elMontantAtt)   elMontantAtt.textContent    = formaterMontant(montantAttente);
-    if (elMontantTotal) elMontantTotal.textContent  = formaterMontant(montantRecu + montantAttente);
-  }
+  <!-- MODALE NOUVEAU PAIEMENT -->
+  <div class="overlay" id="overlay-paiement">
+    <div class="modale" style="max-width:600px;">
+      <div class="modale__entete">
+        <h2 class="modale__titre" id="modale-paiement-titre">Nouveau paiement</h2>
+        <button class="modale__fermer" aria-label="Fermer">✕</button>
+      </div>
+      <div class="modale__corps">
+        <form id="formulaire-paiement">
 
-  /* ---- Filtres ---- */
-  function appliquerFiltres() {
-    const recherche    = (document.getElementById('recherche-paiements') || {}).value || '';
-    const filtreStatut = (document.getElementById('filtre-statut-paiement') || {}).value || '';
-    const filtreService = (document.getElementById('filtre-service') || {}).value || '';
+          <div class="form-article">
 
-    let filtres = tousPaiements.filter(function (p) {
-      const correspondRecherche = !recherche ||
-        (p.client_nom && p.client_nom.toLowerCase().includes(recherche.toLowerCase())) ||
-        (p.reference && p.reference.toLowerCase().includes(recherche.toLowerCase()));
+            <div class="form-groupe">
+              <label for="ref-paiement">Référence *</label>
+              <input type="text" id="ref-paiement" name="reference" placeholder="Ex: PAY-2025-001" required>
+            </div>
 
-      const correspondStatut  = !filtreStatut  || p.statut  === filtreStatut;
-      const correspondService = !filtreService || p.service === filtreService;
+            <div class="form-groupe">
+              <label for="client-paiement">Nom du client *</label>
+              <input type="text" id="client-paiement" name="client_nom" placeholder="Nom du client" required>
+            </div>
 
-      return correspondRecherche && correspondStatut && correspondService;
-    });
+            <div class="form-groupe">
+              <label for="service-paiement">Service</label>
+              <select id="service-paiement" name="service">
+                <option value="Maritime">Maritime</option>
+                <option value="Aérien">Aérien</option>
+                <option value="Ferroviaire">Ferroviaire</option>
+                <option value="Terrestre">Terrestre</option>
+                <option value="Bureau d'achats">Bureau d'achats</option>
+                <option value="Voyages">Voyages</option>
+                <option value="Assurances">Assurances</option>
+              </select>
+            </div>
 
-    afficherPaiements(filtres);
-  }
+            <div class="form-groupe">
+              <label for="montant-paiement">Montant (FCFA) *</label>
+              <input type="number" id="montant-paiement" name="montant" placeholder="0" min="0" required>
+            </div>
 
-  /* ---- Affichage tableau ---- */
-  function afficherPaiements(paiements) {
-    const tbody = document.getElementById('tbody-paiements');
-    const infoPagination = document.getElementById('info-pagination');
-    if (!tbody) return;
+            <div class="form-groupe">
+              <label for="mode-paiement">Mode de paiement</label>
+              <select id="mode-paiement" name="mode_paiement">
+                <option value="Virement bancaire">Virement bancaire</option>
+                <option value="Mobile Money">Mobile Money</option>
+                <option value="Espèces">Espèces</option>
+                <option value="Chèque">Chèque</option>
+              </select>
+            </div>
 
-    const total = paiements.length;
-    const debut = (pageActuelle - 1) * parPage;
-    const fin   = Math.min(debut + parPage, total);
-    const page  = paiements.slice(debut, fin);
+            <div class="form-groupe">
+              <label for="statut-paiement">Statut</label>
+              <select id="statut-paiement" name="statut">
+                <option value="attente">En attente</option>
+                <option value="recu">Reçu</option>
+                <option value="annule">Annulé</option>
+              </select>
+            </div>
 
-    if (infoPagination) {
-      infoPagination.textContent = total > 0
-        ? (debut + 1) + ' – ' + fin + ' sur ' + total + ' paiement(s)'
-        : '0 paiement';
-    }
+            <div class="form-groupe">
+              <label for="date-echeance">Date d'échéance</label>
+              <input type="date" id="date-echeance" name="date_echeance">
+            </div>
 
-    if (page.length === 0) {
-      tbody.innerHTML = '<tr><td colspan="8"><div class="etat-vide"><div class="etat-vide__icone">💰</div><div class="etat-vide__texte">Aucun paiement trouvé</div></div></td></tr>';
-      return;
-    }
+            <div class="form-groupe">
+              <label for="date-paiement-effectif">Date paiement effectif</label>
+              <input type="date" id="date-paiement-effectif" name="date_paiement">
+            </div>
 
-    tbody.innerHTML = page.map(function (p) {
-      const badge = p.statut === 'recu'
-        ? '<span class="badge badge--vert">✓ Reçu</span>'
-        : p.statut === 'annule'
-          ? '<span class="badge badge--rouge">✗ Annulé</span>'
-          : '<span class="badge badge--or">⏳ En attente</span>';
+            <div class="form-groupe form-groupe--plein">
+              <label for="notes-paiement">Notes</label>
+              <textarea id="notes-paiement" name="notes" placeholder="Notes optionnelles..." style="min-height:80px;"></textarea>
+            </div>
 
-      return '<tr>' +
-        '<td><strong>' + escHtml(p.reference || '—') + '</strong></td>' +
-        '<td>' + escHtml(p.client_nom || '—') + '</td>' +
-        '<td>' + escHtml(p.service || '—') + '</td>' +
-        '<td><strong>' + formaterMontant(p.montant) + '</strong></td>' +
-        '<td>' + formaterDate(p.date_echeance) + '</td>' +
-        '<td>' + formaterDate(p.date_paiement) + '</td>' +
-        '<td>' + badge + '</td>' +
-        '<td class="td-actions">' +
-          '<button class="btn btn--sm btn--gris" onclick="voirPaiement(\'' + p.id + '\')">Détails</button>' +
-          (p.statut === 'attente' ? '<button class="btn btn--sm btn--vert" onclick="marquerRecu(\'' + p.id + '\')">Marquer reçu</button>' : '') +
-          '<button class="btn btn--sm btn--rouge" onclick="supprimerPaiement(\'' + p.id + '\')">✕</button>' +
-        '</td>' +
-      '</tr>';
-    }).join('');
-  }
+          </div>
 
-  /* ---- Voir détails paiement ---- */
-  window.voirPaiement = function (id) {
-    const p = tousPaiements.find(function (x) { return x.id == id; });
-    if (!p) return;
+          <div class="modale__pied" style="padding:0;margin-top:24px;">
+            <button type="button" class="btn btn--gris btn-fermer-modale">Annuler</button>
+            <button type="submit" class="btn btn--or">Enregistrer</button>
+          </div>
 
-    const corps = document.getElementById('detail-paiement-corps');
-    const overlay = document.getElementById('overlay-detail-paiement');
-    if (!corps || !overlay) return;
+        </form>
+      </div>
+    </div>
+  </div>
 
-    corps.innerHTML = '<div class="detail-info">' +
-      '<div class="detail-info__item"><div class="detail-info__label">Référence</div><div class="detail-info__valeur">' + escHtml(p.reference) + '</div></div>' +
-      '<div class="detail-info__item"><div class="detail-info__label">Statut</div><div class="detail-info__valeur">' +
-        (p.statut === 'recu' ? '✅ Reçu' : p.statut === 'annule' ? '❌ Annulé' : '⏳ En attente') + '</div></div>' +
-      '<div class="detail-info__item"><div class="detail-info__label">Client</div><div class="detail-info__valeur">' + escHtml(p.client_nom) + '</div></div>' +
-      '<div class="detail-info__item"><div class="detail-info__label">Service</div><div class="detail-info__valeur">' + escHtml(p.service) + '</div></div>' +
-      '<div class="detail-info__item"><div class="detail-info__label">Montant</div><div class="detail-info__valeur"><strong>' + formaterMontant(p.montant) + '</strong></div></div>' +
-      '<div class="detail-info__item"><div class="detail-info__label">Mode de paiement</div><div class="detail-info__valeur">' + escHtml(p.mode_paiement || '—') + '</div></div>' +
-      '<div class="detail-info__item"><div class="detail-info__label">Date d\'échéance</div><div class="detail-info__valeur">' + formaterDate(p.date_echeance) + '</div></div>' +
-      '<div class="detail-info__item"><div class="detail-info__label">Date de paiement</div><div class="detail-info__valeur">' + formaterDate(p.date_paiement) + '</div></div>' +
-      (p.notes ? '<div class="detail-info__item detail-info__item--plein"><div class="detail-info__label">Notes</div><div class="detail-info__valeur">' + escHtml(p.notes) + '</div></div>' : '') +
-    '</div>';
+  <!-- Notifications -->
+  <div class="toast-container" id="toast-container"></div>
 
-    overlay.classList.add('visible');
-  };
+  <script src="js/auth.js"></script>
+  <script src="js/paiements.js"></script>
 
-  /* ---- Nouveau paiement ---- */
-  document.getElementById('btn-nouveau-paiement')?.addEventListener('click', function () {
-    paiementEnCours = null;
-    reinitialiserFormulaire();
-    document.getElementById('modale-paiement-titre').textContent = 'Nouveau paiement';
-    document.getElementById('overlay-paiement').classList.add('visible');
-  });
-
-  /* ---- Formulaire paiement ---- */
-  document.getElementById('formulaire-paiement')?.addEventListener('submit', function (e) {
-    e.preventDefault();
-
-    const formData = new FormData(this);
-    const payload  = {};
-    formData.forEach(function (val, cle) { payload[cle] = val; });
-
-    const methode  = paiementEnCours ? 'PUT' : 'POST';
-    const endpoint = paiementEnCours ? (API + '/paiements/' + paiementEnCours.id) : (API + '/paiements');
-
-    fetch(endpoint, {
-      method: methode,
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(payload)
-    })
-      .then(function (r) { return r.json(); })
-      .then(function () {
-        fermerModales();
-        chargerPaiements();
-        afficherToast(paiementEnCours ? 'Paiement mis à jour' : 'Paiement enregistré', 'succes');
-      })
-      .catch(function () {
-        afficherToast('Erreur lors de l\'enregistrement', 'erreur');
-      });
-  });
-
-  function reinitialiserFormulaire() {
-    const f = document.getElementById('formulaire-paiement');
-    if (f) f.reset();
-  }
-
-  /* ---- Marquer paiement comme reçu ---- */
-  window.marquerRecu = function (id) {
-    if (!confirm('Confirmer la réception de ce paiement ?')) return;
-
-    fetch(API + '/paiements/' + id, {
-      method: 'PUT',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ statut: 'recu', date_paiement: new Date().toISOString().slice(0, 10) })
-    })
-      .then(function (r) { return r.json(); })
-      .then(function () {
-        const p = tousPaiements.find(function (x) { return x.id == id; });
-        if (p) { p.statut = 'recu'; p.date_paiement = new Date().toISOString().slice(0, 10); }
-        appliquerFiltres();
-        mettreAJourResume();
-        afficherToast('Paiement marqué comme reçu', 'succes');
-      })
-      .catch(function () {
-        afficherToast('Erreur lors de la mise à jour', 'erreur');
-      });
-  };
-
-  /* ---- Supprimer paiement ---- */
-  window.supprimerPaiement = function (id) {
-    if (!confirm('Supprimer ce paiement ?\nCette action est irréversible.')) return;
-
-    fetch(API + '/paiements/' + id, { method: 'DELETE' })
-      .then(function () {
-        tousPaiements = tousPaiements.filter(function (p) { return p.id != id; });
-        appliquerFiltres();
-        mettreAJourResume();
-        afficherToast('Paiement supprimé', 'succes');
-      })
-      .catch(function () {
-        afficherToast('Erreur lors de la suppression', 'erreur');
-      });
-  };
-
-  /* ---- Export CSV ---- */
-  document.getElementById('btn-export-paiements')?.addEventListener('click', function () {
-    if (tousPaiements.length === 0) {
-      afficherToast('Aucune donnée à exporter', 'info');
-      return;
-    }
-
-    const entetes = ['Référence', 'Client', 'Service', 'Montant (FCFA)', 'Date échéance', 'Date paiement', 'Statut'];
-    const lignes  = tousPaiements.map(function (p) {
-      return [
-        '"' + (p.reference || '') + '"',
-        '"' + (p.client_nom || '') + '"',
-        '"' + (p.service || '') + '"',
-        '"' + (p.montant || '') + '"',
-        '"' + formaterDate(p.date_echeance) + '"',
-        '"' + formaterDate(p.date_paiement) + '"',
-        '"' + (p.statut || '') + '"'
-      ].join(',');
-    });
-
-    const csv  = [entetes.join(',')].concat(lignes).join('\n');
-    const blob = new Blob(['\uFEFF' + csv], { type: 'text/csv;charset=utf-8;' });
-    const url  = URL.createObjectURL(blob);
-    const a    = document.createElement('a');
-    a.href     = url;
-    a.download = 'paiements-sofretma-' + new Date().toISOString().slice(0, 10) + '.csv';
-    a.click();
-    URL.revokeObjectURL(url);
-    afficherToast('Export CSV téléchargé', 'succes');
-  });
-
-  /* ---- Listeners filtres ---- */
-  ['recherche-paiements', 'filtre-statut-paiement', 'filtre-service'].forEach(function (id) {
-    const el = document.getElementById(id);
-    if (el) el.addEventListener('input', function () { pageActuelle = 1; appliquerFiltres(); });
-  });
-
-  /* ---- Fermeture modales ---- */
-  function fermerModales() {
-    document.querySelectorAll('.overlay').forEach(function (o) { o.classList.remove('visible'); });
-  }
-
-  document.querySelectorAll('.modale__fermer, .btn-fermer-modale').forEach(function (btn) {
-    btn.addEventListener('click', fermerModales);
-  });
-
-  document.querySelectorAll('.overlay').forEach(function (overlay) {
-    overlay.addEventListener('click', function (e) {
-      if (e.target === overlay) fermerModales();
-    });
-  });
-
-  /* ---- Sidebar mobile ---- */
-  const hamburger = document.getElementById('hamburger-admin');
-  const sidebar   = document.querySelector('.sidebar');
-  if (hamburger && sidebar) {
-    hamburger.addEventListener('click', function () { sidebar.classList.toggle('ouverte'); });
-    document.addEventListener('click', function (e) {
-      if (!sidebar.contains(e.target) && !hamburger.contains(e.target)) sidebar.classList.remove('ouverte');
-    });
-  }
-
-  /* ---- Init ---- */
-  chargerPaiements();
-
-});
+</body>
+</html>
