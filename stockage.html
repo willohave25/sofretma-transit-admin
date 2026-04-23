@@ -1,0 +1,419 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Stockage & Entreposage | Administration SOFRETMA TRANSIT</title>
+  <meta name="robots" content="noindex, nofollow">
+  <link rel="icon" href="images/logo-sofretma-blanc.png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/admin.css">
+</head>
+<body>
+
+  <div class="admin-layout">
+
+    <!-- SIDEBAR -->
+    <aside class="sidebar">
+      <div class="sidebar__logo">
+        <picture>
+          <source srcset="images/logo-sofretma-blanc.webp" type="image/webp">
+          <img src="images/logo-sofretma-blanc.png" alt="SOFRETMA TRANSIT" width="140">
+        </picture>
+      </div>
+      <nav class="sidebar__nav">
+        <a href="dashboard.html" class="sidebar__lien">
+          <span class="icone">🏠</span> Tableau de bord
+        </a>
+        <a href="clients.html" class="sidebar__lien">
+          <span class="icone">👥</span> Clients inscrits
+        </a>
+        <a href="paiements.html" class="sidebar__lien">
+          <span class="icone">💰</span> Paiements
+        </a>
+        <a href="expeditions.html" class="sidebar__lien">
+          <span class="icone">🚢</span> Expéditions
+        </a>
+        <a href="conteneurs.html" class="sidebar__lien">
+          <span class="icone">📦</span> Conteneurs
+        </a>
+        <a href="stockage.html" class="sidebar__lien actif">
+          <span class="icone">🏭</span> Stockage & Entreposage
+        </a>
+        <a href="actualites.html" class="sidebar__lien">
+          <span class="icone">📰</span> Actualités
+        </a>
+        <a href="medias.html" class="sidebar__lien">
+          <span class="icone">🖼️</span> Médiathèque
+        </a>
+        <a href="formulaires.html" class="sidebar__lien">
+          <span class="icone">📋</span> Formulaires reçus
+        </a>
+        <div class="sidebar__separateur"></div>
+      </nav>
+      <div class="sidebar__footer">
+        <button class="sidebar__deconnexion" id="btn-deconnexion">
+          <span class="icone">🚪</span> Déconnexion
+        </button>
+      </div>
+    </aside>
+
+    <!-- CONTENU PRINCIPAL -->
+    <div class="contenu-principal">
+
+      <header class="topbar">
+        <div style="display:flex;align-items:center;gap:12px;">
+          <button class="hamburger-admin" id="hamburger-admin" aria-label="Menu">
+            <span></span><span></span><span></span>
+          </button>
+          <div>
+            <h1 class="topbar__titre">Stockage & Entreposage</h1>
+          </div>
+        </div>
+        <div class="topbar__droite">
+          <button class="btn btn--gris btn--sm" id="btn-export-stock">⬇ Export CSV</button>
+          <button class="btn btn--or" id="btn-nouveau-stock">+ Nouvelle demande</button>
+        </div>
+      </header>
+
+      <main class="page-contenu">
+
+        <!-- Sous-titre contextuel -->
+        <div style="background:linear-gradient(135deg,var(--vert-logo),var(--vert-fonce));border-radius:12px;padding:20px 24px;margin-bottom:24px;color:#fff;">
+          <div style="font-size:1rem;font-weight:700;margin-bottom:4px;">Gestion de marchandises et conteneurs</div>
+          <div style="font-size:.875rem;opacity:.85;max-width:700px;">
+            Ce module permet d'organiser le stockage, la gestion, la sécurité et la livraison des marchandises et conteneurs de vos clients entreposés dans les entrepôts SOFRETMA TRANSIT.
+          </div>
+        </div>
+
+        <!-- Compteurs -->
+        <div class="stats-grille" style="margin-bottom:24px;">
+          <div class="stat-card stat-card--bleu">
+            <div class="stat-card__icone">🏭</div>
+            <div class="stat-card__valeur" id="compteur-stock-total">—</div>
+            <div class="stat-card__label">Dossiers totaux</div>
+          </div>
+          <div class="stat-card stat-card--or">
+            <div class="stat-card__icone">📦</div>
+            <div class="stat-card__valeur" id="compteur-stock-actif">—</div>
+            <div class="stat-card__label">En stockage</div>
+          </div>
+          <div class="stat-card stat-card--rouge">
+            <div class="stat-card__icone">📅</div>
+            <div class="stat-card__valeur" id="compteur-stock-sortie">—</div>
+            <div class="stat-card__label">Sorties prévues</div>
+          </div>
+          <div class="stat-card stat-card--vert">
+            <div class="stat-card__icone">⏳</div>
+            <div class="stat-card__valeur" id="compteur-stock-attente">—</div>
+            <div class="stat-card__label">En attente</div>
+          </div>
+        </div>
+
+        <!-- Plan d'occupation des zones entrepôt -->
+        <div class="card" style="margin-bottom:24px;">
+          <div class="card__entete">
+            <h2 class="card__titre">🗺️ Plan d'occupation de l'entrepôt</h2>
+            <div style="display:flex;gap:12px;font-size:.75rem;flex-wrap:wrap;">
+              <span style="display:flex;align-items:center;gap:5px;"><span style="width:12px;height:12px;border-radius:3px;background:#bbf7d0;display:inline-block;"></span> Libre</span>
+              <span style="display:flex;align-items:center;gap:5px;"><span style="width:12px;height:12px;border-radius:3px;background:#fde68a;display:inline-block;"></span> Occupé</span>
+              <span style="display:flex;align-items:center;gap:5px;"><span style="width:12px;height:12px;border-radius:3px;background:#fecaca;display:inline-block;"></span> Plein</span>
+            </div>
+          </div>
+          <div class="entrepot-grille" id="grille-zones">
+            <div class="chargement">Chargement des zones...</div>
+          </div>
+        </div>
+
+        <!-- Barre d'outils -->
+        <div class="barre-outils">
+          <div class="barre-outils__recherche">
+            <input type="text" id="recherche-stock" placeholder="Référence, code client, marchandise...">
+          </div>
+          <select id="filtre-type-stock">
+            <option value="">Tous les types</option>
+            <option value="Standard">📦 Standard</option>
+            <option value="Réfrigéré">❄️ Réfrigéré</option>
+            <option value="Sécurisé">🔒 Sécurisé</option>
+            <option value="Vrac">🏗️ Vrac</option>
+            <option value="Conteneur">🚢 Conteneur</option>
+          </select>
+          <select id="filtre-statut-stock">
+            <option value="">Tous les statuts</option>
+            <option value="en_attente">En attente</option>
+            <option value="en_stockage">En stockage</option>
+            <option value="sortie_prevue">Sortie prévue</option>
+            <option value="sorti">Sorti</option>
+            <option value="litige">Litige</option>
+          </select>
+          <select id="filtre-zone">
+            <option value="">Toutes les zones</option>
+            <option value="A">Zone A — Général</option>
+            <option value="B">Zone B — Industriel</option>
+            <option value="C">Zone C — Réfrigéré</option>
+            <option value="D">Zone D — Sécurisé</option>
+            <option value="E">Zone E — Conteneurs</option>
+            <option value="F">Zone F — Vrac</option>
+          </select>
+        </div>
+
+        <!-- Tableau stockage -->
+        <div class="card">
+          <div class="table-wrapper">
+            <table>
+              <thead>
+                <tr>
+                  <th>Référence</th>
+                  <th>Code client</th>
+                  <th>Client</th>
+                  <th>Type stockage</th>
+                  <th>Marchandise</th>
+                  <th>Emplacement</th>
+                  <th>Date entrée</th>
+                  <th>Durée</th>
+                  <th>Statut</th>
+                  <th>Actions</th>
+                </tr>
+              </thead>
+              <tbody id="tbody-stockage">
+                <tr><td colspan="10" class="chargement">Chargement des données...</td></tr>
+              </tbody>
+            </table>
+          </div>
+          <div class="pagination">
+            <span class="pagination__info" id="info-pagination"></span>
+          </div>
+        </div>
+
+      </main>
+    </div>
+
+  </div>
+
+  <!-- MODALE DÉTAIL DOSSIER -->
+  <div class="overlay" id="overlay-detail-stock">
+    <div class="modale" style="max-width:640px;">
+      <div class="modale__entete">
+        <h2 class="modale__titre">Détails — Dossier de stockage</h2>
+        <button class="modale__fermer" aria-label="Fermer">✕</button>
+      </div>
+      <div class="modale__corps" id="detail-stock-corps"></div>
+      <div class="modale__pied">
+        <button class="btn btn--gris btn-fermer-modale">Fermer</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODALE FORMULAIRE STOCKAGE -->
+  <div class="overlay" id="overlay-stock-form">
+    <div class="modale" style="max-width:720px;">
+      <div class="modale__entete">
+        <h2 class="modale__titre" id="modale-stock-titre">Nouvelle demande de stockage</h2>
+        <button class="modale__fermer" aria-label="Fermer">✕</button>
+      </div>
+      <div class="modale__corps">
+        <form id="formulaire-stockage">
+
+          <!-- Séparateur section -->
+          <div style="font-size:.75rem;font-weight:700;color:var(--vert-logo);text-transform:uppercase;letter-spacing:.06em;margin-bottom:12px;padding-bottom:6px;border-bottom:2px solid var(--vert-logo);">
+            Identification
+          </div>
+          <div class="form-article" style="margin-bottom:20px;">
+
+            <div class="form-groupe">
+              <label for="stock-reference">Référence dossier *</label>
+              <input type="text" id="stock-reference" name="reference" placeholder="Ex: STK-2025-001" required>
+            </div>
+
+            <div class="form-groupe">
+              <label for="stock-code-client">Code client *</label>
+              <input type="text" id="stock-code-client" name="code_client" placeholder="Ex: CLT-0042" required>
+            </div>
+
+            <div class="form-groupe">
+              <label for="stock-client-nom">Nom du client *</label>
+              <input type="text" id="stock-client-nom" name="client_nom" placeholder="Nom complet" required>
+            </div>
+
+            <div class="form-groupe">
+              <label for="stock-client-tel">Téléphone client</label>
+              <input type="tel" id="stock-client-tel" name="client_telephone" placeholder="+225...">
+            </div>
+
+            <div class="form-groupe form-groupe--plein">
+              <label for="stock-client-email">Email client</label>
+              <input type="email" id="stock-client-email" name="client_email" placeholder="email@exemple.com">
+            </div>
+
+          </div>
+
+          <!-- Marchandise -->
+          <div style="font-size:.75rem;font-weight:700;color:var(--vert-logo);text-transform:uppercase;letter-spacing:.06em;margin-bottom:12px;padding-bottom:6px;border-bottom:2px solid var(--vert-logo);">
+            Marchandise
+          </div>
+          <div class="form-article" style="margin-bottom:20px;">
+
+            <div class="form-groupe">
+              <label for="stock-type-marchandise">Type de marchandise *</label>
+              <select id="stock-type-marchandise" name="type_marchandise" required>
+                <option value="">Sélectionner...</option>
+                <option value="Marchandise générale">Marchandise générale</option>
+                <option value="Matériel industriel">Matériel industriel</option>
+                <option value="Véhicule">Véhicule</option>
+                <option value="Denrées alimentaires">Denrées alimentaires</option>
+                <option value="Produits pharmaceutiques">Produits pharmaceutiques</option>
+                <option value="Matières dangereuses">Matières dangereuses</option>
+                <option value="Textile / Confection">Textile / Confection</option>
+                <option value="Électronique">Électronique</option>
+                <option value="Métaux et minerais">Métaux et minerais</option>
+                <option value="Conteneur">Conteneur</option>
+                <option value="Autre">Autre</option>
+              </select>
+            </div>
+
+            <div class="form-groupe">
+              <label for="stock-type-stockage">Type de stockage *</label>
+              <select id="stock-type-stockage" name="type_stockage" required>
+                <option value="Standard">📦 Standard</option>
+                <option value="Réfrigéré">❄️ Réfrigéré</option>
+                <option value="Sécurisé">🔒 Sécurisé</option>
+                <option value="Vrac">🏗️ Vrac</option>
+                <option value="Conteneur">🚢 Conteneur</option>
+              </select>
+            </div>
+
+            <div class="form-groupe form-groupe--plein">
+              <label for="stock-description">Description complète de la marchandise *</label>
+              <textarea id="stock-description" name="description_marchandise" placeholder="Description détaillée : nature, conditionnement, marques, références..." required></textarea>
+            </div>
+
+            <div class="form-groupe">
+              <label for="stock-quantite">Quantité</label>
+              <input type="number" id="stock-quantite" name="quantite" placeholder="0" min="0">
+            </div>
+
+            <div class="form-groupe">
+              <label for="stock-unite">Unité</label>
+              <select id="stock-unite" name="unite">
+                <option value="unités">Unités</option>
+                <option value="colis">Colis</option>
+                <option value="palettes">Palettes</option>
+                <option value="cartons">Cartons</option>
+                <option value="sacs">Sacs</option>
+                <option value="fûts">Fûts</option>
+                <option value="conteneurs">Conteneurs</option>
+              </select>
+            </div>
+
+            <div class="form-groupe">
+              <label for="stock-poids">Poids total (kg)</label>
+              <input type="number" id="stock-poids" name="poids" placeholder="0" min="0" step="0.1">
+            </div>
+
+            <div class="form-groupe">
+              <label for="stock-volume">Volume (m³)</label>
+              <input type="number" id="stock-volume" name="volume" placeholder="0" min="0" step="0.01">
+            </div>
+
+            <div class="form-groupe">
+              <label for="stock-conteneur">N° conteneur lié</label>
+              <input type="text" id="stock-conteneur" name="conteneur_numero" placeholder="Optionnel">
+            </div>
+
+          </div>
+
+          <!-- Emplacement & Dates -->
+          <div style="font-size:.75rem;font-weight:700;color:var(--vert-logo);text-transform:uppercase;letter-spacing:.06em;margin-bottom:12px;padding-bottom:6px;border-bottom:2px solid var(--vert-logo);">
+            Emplacement & Planning
+          </div>
+          <div class="form-article" style="margin-bottom:20px;">
+
+            <div class="form-groupe">
+              <label for="stock-zone">Zone entrepôt</label>
+              <select id="stock-zone" name="zone">
+                <option value="">Non assignée</option>
+                <option value="A">Zone A — Marchandises générales</option>
+                <option value="B">Zone B — Matériel industriel</option>
+                <option value="C">Zone C — Réfrigéré</option>
+                <option value="D">Zone D — Sécurisé / Haute valeur</option>
+                <option value="E">Zone E — Conteneurs</option>
+                <option value="F">Zone F — Vrac</option>
+              </select>
+            </div>
+
+            <div class="form-groupe">
+              <label for="stock-allee">Allée</label>
+              <input type="text" id="stock-allee" name="allee" placeholder="Ex: A, B, C...">
+            </div>
+
+            <div class="form-groupe">
+              <label for="stock-case">Case / Emplacement</label>
+              <input type="text" id="stock-case" name="case_num" placeholder="Ex: 01, 02...">
+            </div>
+
+            <div class="form-groupe">
+              <label for="stock-statut">Statut</label>
+              <select id="stock-statut" name="statut">
+                <option value="en_attente">En attente</option>
+                <option value="en_stockage">En stockage</option>
+                <option value="sortie_prevue">Sortie prévue</option>
+                <option value="sorti">Sorti</option>
+                <option value="litige">Litige</option>
+              </select>
+            </div>
+
+            <div class="form-groupe">
+              <label for="stock-date-entree">Date d'entrée *</label>
+              <input type="date" id="stock-date-entree" name="date_entree" required>
+            </div>
+
+            <div class="form-groupe">
+              <label for="stock-date-sortie">Date de sortie prévue</label>
+              <input type="date" id="stock-date-sortie" name="date_sortie_prevue">
+            </div>
+
+          </div>
+
+          <!-- Sécurité & Instructions -->
+          <div style="font-size:.75rem;font-weight:700;color:var(--vert-logo);text-transform:uppercase;letter-spacing:.06em;margin-bottom:12px;padding-bottom:6px;border-bottom:2px solid var(--vert-logo);">
+            Sécurité & Instructions spéciales
+          </div>
+          <div class="form-article">
+
+            <div class="form-groupe form-groupe--plein">
+              <label for="stock-conditions">Conditions de stockage spéciales</label>
+              <textarea id="stock-conditions" name="conditions_speciales" placeholder="Ex: Température entre 2°C et 8°C, humidité contrôlée, à l'abri de la lumière..."></textarea>
+            </div>
+
+            <div class="form-groupe form-groupe--plein">
+              <label for="stock-securite">Instructions de sécurité</label>
+              <textarea id="stock-securite" name="instructions_securite" placeholder="Ex: Matières inflammables — interdiction de fumer, accès restreint, équipement requis..."></textarea>
+            </div>
+
+            <div class="form-groupe form-groupe--plein">
+              <label for="stock-notes">Notes internes</label>
+              <textarea id="stock-notes" name="notes" placeholder="Notes internes pour l'équipe..."></textarea>
+            </div>
+
+          </div>
+
+          <div class="modale__pied" style="padding:0;margin-top:24px;">
+            <button type="button" class="btn btn--gris btn-fermer-modale">Annuler</button>
+            <button type="submit" class="btn btn--or">Enregistrer le dossier</button>
+          </div>
+
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- Notifications -->
+  <div class="toast-container" id="toast-container"></div>
+
+  <script src="js/auth.js"></script>
+  <script src="js/stockage.js"></script>
+
+</body>
+</html>
