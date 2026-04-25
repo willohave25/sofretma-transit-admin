@@ -102,12 +102,14 @@ document.addEventListener('DOMContentLoaded', function () {
     const enStockage  = tousDossiers.filter(function (d) { return d.statut === 'en_stockage'; }).length;
     const sortiesPrev = tousDossiers.filter(function (d) { return d.statut === 'sortie_prevue'; }).length;
     const enAttente   = tousDossiers.filter(function (d) { return d.statut === 'en_attente'; }).length;
+    const sousDouane  = tousDossiers.filter(function (d) { return d.regime_douanier === 'sous_douane'; }).length;
 
     const set = function (id, v) { const el = document.getElementById(id); if (el) el.textContent = v; };
-    set('compteur-stock-total',    total);
-    set('compteur-stock-actif',    enStockage);
-    set('compteur-stock-sortie',   sortiesPrev);
-    set('compteur-stock-attente',  enAttente);
+    set('compteur-stock-total',   total);
+    set('compteur-stock-actif',   enStockage);
+    set('compteur-stock-sortie',  sortiesPrev);
+    set('compteur-stock-attente', enAttente);
+    set('compteur-stock-douane',  sousDouane);
   }
 
   /* ---- Plan d'occupation des zones ---- */
@@ -132,12 +134,23 @@ document.addEventListener('DOMContentLoaded', function () {
     }).join('');
   }
 
+  /* ---- Badge régime douanier ---- */
+  function badgeRegime(regime) {
+    const map = {
+      'hors_douane': '<span class="badge badge--vert">🔓 Hors douane</span>',
+      'sous_douane': '<span class="badge badge--bleu">🏛️ Sous douane</span>',
+      'transit':     '<span class="badge badge--gris">🔄 Transit</span>'
+    };
+    return map[regime] || '<span class="badge badge--gris">' + escHtml(regime || '—') + '</span>';
+  }
+
   /* ---- Filtres ---- */
   function appliquerFiltres() {
     const recherche    = (document.getElementById('recherche-stock') || {}).value || '';
     const filtreType   = (document.getElementById('filtre-type-stock') || {}).value || '';
     const filtreStatut = (document.getElementById('filtre-statut-stock') || {}).value || '';
     const filtreZone   = (document.getElementById('filtre-zone') || {}).value || '';
+    const filtreRegime = (document.getElementById('filtre-regime') || {}).value || '';
 
     let filtres = tousDossiers.filter(function (d) {
       const correspondRecherche = !recherche ||
@@ -146,11 +159,12 @@ document.addEventListener('DOMContentLoaded', function () {
         (d.client_nom && d.client_nom.toLowerCase().includes(recherche.toLowerCase())) ||
         (d.description_marchandise && d.description_marchandise.toLowerCase().includes(recherche.toLowerCase()));
 
-      const correspondType   = !filtreType   || d.type_stockage === filtreType;
-      const correspondStatut = !filtreStatut || d.statut         === filtreStatut;
-      const correspondZone   = !filtreZone   || d.zone           === filtreZone;
+      const correspondType   = !filtreType   || d.type_stockage    === filtreType;
+      const correspondStatut = !filtreStatut || d.statut            === filtreStatut;
+      const correspondZone   = !filtreZone   || d.zone              === filtreZone;
+      const correspondRegime = !filtreRegime || d.regime_douanier   === filtreRegime;
 
-      return correspondRecherche && correspondType && correspondStatut && correspondZone;
+      return correspondRecherche && correspondType && correspondStatut && correspondZone && correspondRegime;
     });
 
     afficherTableau(filtres);
@@ -174,7 +188,7 @@ document.addEventListener('DOMContentLoaded', function () {
     }
 
     if (page.length === 0) {
-      tbody.innerHTML = '<tr><td colspan="10"><div class="etat-vide"><div class="etat-vide__icone">🏭</div><div class="etat-vide__texte">Aucun dossier de stockage</div></div></td></tr>';
+      tbody.innerHTML = '<tr><td colspan="11"><div class="etat-vide"><div class="etat-vide__icone">🏭</div><div class="etat-vide__texte">Aucun dossier de stockage</div></div></td></tr>';
       return;
     }
 
@@ -192,7 +206,8 @@ document.addEventListener('DOMContentLoaded', function () {
         '<td><code style="background:var(--gris-clair);padding:2px 8px;border-radius:4px;font-size:.8rem;">' + escHtml(d.code_client || '—') + '</code></td>' +
         '<td>' + escHtml(d.client_nom || '—') + '</td>' +
         '<td>' + badgeTypeStockage(d.type_stockage) + '</td>' +
-        '<td style="max-width:180px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;" title="' + escHtml(d.description_marchandise) + '">' + escHtml(d.description_marchandise || '—') + '</td>' +
+        '<td>' + badgeRegime(d.regime_douanier) + '</td>' +
+        '<td style="max-width:160px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;" title="' + escHtml(d.description_marchandise) + '">' + escHtml(d.description_marchandise || '—') + '</td>' +
         '<td>' + emplacement + alerteSortie + '</td>' +
         '<td>' + formaterDate(d.date_entree) + '</td>' +
         '<td>' + formaterDuree(d.date_entree, d.statut === 'sorti' ? d.date_sortie_reelle : null) + '</td>' +
@@ -219,11 +234,16 @@ document.addEventListener('DOMContentLoaded', function () {
     const emplacement = [d.zone && ('Zone ' + d.zone), d.allee && ('Allée ' + d.allee), d.case_num && ('Case ' + d.case_num)]
       .filter(Boolean).join(' / ') || '—';
 
+    /* Mémoriser le dossier courant pour le bon de mouvement */
+    document.getElementById('btn-bon-mouvement').dataset.dossierId = id;
+
     corps.innerHTML = '<div class="detail-info">' +
       '<div class="detail-info__item"><div class="detail-info__label">Référence</div><div class="detail-info__valeur">' + escHtml(d.reference) + '</div></div>' +
       '<div class="detail-info__item"><div class="detail-info__label">Code client</div><div class="detail-info__valeur">' + escHtml(d.code_client) + '</div></div>' +
       '<div class="detail-info__item"><div class="detail-info__label">Client</div><div class="detail-info__valeur">' + escHtml(d.client_nom) + '</div></div>' +
+      '<div class="detail-info__item"><div class="detail-info__label">Téléphone</div><div class="detail-info__valeur">' + escHtml(d.client_telephone || '—') + '</div></div>' +
       '<div class="detail-info__item"><div class="detail-info__label">Type de stockage</div><div class="detail-info__valeur">' + badgeTypeStockage(d.type_stockage) + '</div></div>' +
+      '<div class="detail-info__item"><div class="detail-info__label">Régime douanier</div><div class="detail-info__valeur">' + badgeRegime(d.regime_douanier) + '</div></div>' +
       '<div class="detail-info__item detail-info__item--plein"><div class="detail-info__label">Description marchandise</div><div class="detail-info__valeur">' + escHtml(d.description_marchandise || '—') + '</div></div>' +
       '<div class="detail-info__item"><div class="detail-info__label">Quantité</div><div class="detail-info__valeur">' + escHtml(d.quantite || '—') + ' ' + escHtml(d.unite || '') + '</div></div>' +
       '<div class="detail-info__item"><div class="detail-info__label">Poids total</div><div class="detail-info__valeur">' + (d.poids ? d.poids + ' kg' : '—') + '</div></div>' +
@@ -235,6 +255,7 @@ document.addEventListener('DOMContentLoaded', function () {
       '<div class="detail-info__item"><div class="detail-info__label">Sortie réelle</div><div class="detail-info__valeur">' + formaterDate(d.date_sortie_reelle) + '</div></div>' +
       '<div class="detail-info__item"><div class="detail-info__label">Statut</div><div class="detail-info__valeur">' + badgeStatutStockage(d.statut) + '</div></div>' +
       '<div class="detail-info__item"><div class="detail-info__label">Conteneur lié</div><div class="detail-info__valeur">' + escHtml(d.conteneur_numero || '—') + '</div></div>' +
+      (d.destination_finale ? '<div class="detail-info__item detail-info__item--plein"><div class="detail-info__label">Destination finale</div><div class="detail-info__valeur">' + escHtml(d.destination_finale) + '</div></div>' : '') +
       (d.conditions_speciales ? '<div class="detail-info__item detail-info__item--plein"><div class="detail-info__label">Conditions spéciales</div><div class="detail-info__valeur">' + escHtml(d.conditions_speciales) + '</div></div>' : '') +
       (d.instructions_securite ? '<div class="detail-info__item detail-info__item--plein"><div class="detail-info__label">Instructions sécurité</div><div class="detail-info__valeur">' + escHtml(d.instructions_securite) + '</div></div>' : '') +
       (d.notes ? '<div class="detail-info__item detail-info__item--plein"><div class="detail-info__label">Notes</div><div class="detail-info__valeur">' + escHtml(d.notes) + '</div></div>' : '') +
@@ -304,6 +325,8 @@ document.addEventListener('DOMContentLoaded', function () {
     set('date_entree', d.date_entree ? d.date_entree.slice(0, 10) : '');
     set('date_sortie_prevue', d.date_sortie_prevue ? d.date_sortie_prevue.slice(0, 10) : '');
     set('conteneur_numero', d.conteneur_numero);
+    set('regime_douanier', d.regime_douanier || 'hors_douane');
+    set('destination_finale', d.destination_finale);
     set('conditions_speciales', d.conditions_speciales);
     set('instructions_securite', d.instructions_securite);
     set('statut', d.statut);
@@ -357,7 +380,7 @@ document.addEventListener('DOMContentLoaded', function () {
   document.getElementById('btn-export-stock')?.addEventListener('click', function () {
     if (tousDossiers.length === 0) { afficherToast('Aucune donnée à exporter', 'info'); return; }
 
-    const entetes = ['Référence', 'Code client', 'Client', 'Type stockage', 'Marchandise', 'Zone', 'Date entrée', 'Date sortie prévue', 'Durée', 'Statut'];
+    const entetes = ['Référence', 'Code client', 'Client', 'Type stockage', 'Régime douanier', 'Marchandise', 'Zone', 'Date entrée', 'Date sortie prévue', 'Durée', 'Destination finale', 'Statut'];
     const lignes  = tousDossiers.map(function (d) {
       const emp = [d.zone, d.allee, d.case_num].filter(Boolean).join('-');
       return [
@@ -365,11 +388,13 @@ document.addEventListener('DOMContentLoaded', function () {
         '"' + (d.code_client || '') + '"',
         '"' + (d.client_nom || '') + '"',
         '"' + (d.type_stockage || '') + '"',
+        '"' + (d.regime_douanier || '') + '"',
         '"' + (d.description_marchandise || '') + '"',
         '"' + emp + '"',
         '"' + formaterDate(d.date_entree) + '"',
         '"' + formaterDate(d.date_sortie_prevue) + '"',
         '"' + formaterDuree(d.date_entree, d.statut === 'sorti' ? d.date_sortie_reelle : null) + '"',
+        '"' + (d.destination_finale || '') + '"',
         '"' + (d.statut || '') + '"'
       ].join(',');
     });
@@ -381,6 +406,67 @@ document.addEventListener('DOMContentLoaded', function () {
     a.href = url; a.download = 'stockage-sofretma-' + new Date().toISOString().slice(0, 10) + '.csv';
     a.click(); URL.revokeObjectURL(url);
     afficherToast('Export CSV téléchargé', 'succes');
+  });
+
+  /* ---- Bon de mouvement (impression) ---- */
+  document.getElementById('btn-bon-mouvement')?.addEventListener('click', function () {
+    const id = this.dataset.dossierId;
+    const d  = tousDossiers.find(function (x) { return x.id == id; });
+    if (!d) return;
+
+    const regimeLabel = { 'hors_douane': 'Hors douane', 'sous_douane': 'Sous douane', 'transit': 'Transit' };
+    const emplacement = [d.zone && ('Zone ' + d.zone), d.allee && ('Allée ' + d.allee), d.case_num && ('Case ' + d.case_num)]
+      .filter(Boolean).join(' / ') || '—';
+
+    const contenu = '<!DOCTYPE html><html lang="fr"><head><meta charset="UTF-8">' +
+      '<title>Bon de mouvement — ' + escHtml(d.reference) + '</title>' +
+      '<style>body{font-family:Arial,sans-serif;padding:32px;max-width:700px;margin:auto;color:#111}' +
+      'h1{color:#1a6b3a;font-size:1.2rem;margin-bottom:4px}' +
+      '.entete{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:24px;border-bottom:2px solid #1a6b3a;padding-bottom:12px}' +
+      'table{width:100%;border-collapse:collapse;margin-bottom:20px}' +
+      'td{padding:7px 10px;border:1px solid #ddd;font-size:.88rem}' +
+      'td:first-child{background:#f5f5f5;font-weight:600;width:40%}' +
+      '.signature{display:grid;grid-template-columns:1fr 1fr;gap:32px;margin-top:40px}' +
+      '.signature__bloc{border-top:1px solid #888;padding-top:8px;font-size:.8rem;color:#555}' +
+      '@media print{body{padding:16px}}' +
+      '</style></head><body>' +
+      '<div class="entete">' +
+        '<div><h1>SOFRETMA TRANSIT</h1><div style="font-size:.8rem;color:#555">Cocody Anono, Ilot 120, Lot 3004, N°21 — Abidjan<br>+225 01 02 02 01 79 | contact@sofretmatransit.com</div></div>' +
+        '<div style="text-align:right"><div style="font-size:1.1rem;font-weight:700;color:#C9922B">BON DE MOUVEMENT</div>' +
+        '<div style="font-size:.8rem;color:#555">Réf. : ' + escHtml(d.reference) + '<br>Date édition : ' + new Date().toLocaleDateString('fr-FR') + '</div></div>' +
+      '</div>' +
+      '<table>' +
+        '<tr><td>Code client</td><td>' + escHtml(d.code_client || '—') + '</td></tr>' +
+        '<tr><td>Client</td><td>' + escHtml(d.client_nom || '—') + '</td></tr>' +
+        '<tr><td>Téléphone</td><td>' + escHtml(d.client_telephone || '—') + '</td></tr>' +
+        '<tr><td>Type de marchandise</td><td>' + escHtml(d.type_marchandise || '—') + '</td></tr>' +
+        '<tr><td>Description</td><td>' + escHtml(d.description_marchandise || '—') + '</td></tr>' +
+        '<tr><td>Quantité</td><td>' + escHtml(String(d.quantite || '—')) + ' ' + escHtml(d.unite || '') + '</td></tr>' +
+        '<tr><td>Poids total</td><td>' + (d.poids ? d.poids + ' kg' : '—') + '</td></tr>' +
+        '<tr><td>Volume</td><td>' + (d.volume ? d.volume + ' m³' : '—') + '</td></tr>' +
+        '<tr><td>Type de stockage</td><td>' + escHtml(d.type_stockage || '—') + '</td></tr>' +
+        '<tr><td>Régime douanier</td><td>' + escHtml(regimeLabel[d.regime_douanier] || d.regime_douanier || '—') + '</td></tr>' +
+        '<tr><td>Emplacement</td><td>' + escHtml(emplacement) + '</td></tr>' +
+        '<tr><td>Date d\'entrée</td><td>' + formaterDate(d.date_entree) + '</td></tr>' +
+        '<tr><td>Durée en stockage</td><td>' + formaterDuree(d.date_entree, d.statut === 'sorti' ? d.date_sortie_reelle : null) + '</td></tr>' +
+        '<tr><td>Sortie prévue</td><td>' + formaterDate(d.date_sortie_prevue) + '</td></tr>' +
+        '<tr><td>Sortie réelle</td><td>' + formaterDate(d.date_sortie_reelle) + '</td></tr>' +
+        '<tr><td>Destination finale</td><td>' + escHtml(d.destination_finale || '—') + '</td></tr>' +
+        '<tr><td>Conteneur lié</td><td>' + escHtml(d.conteneur_numero || '—') + '</td></tr>' +
+        (d.conditions_speciales ? '<tr><td>Conditions spéciales</td><td>' + escHtml(d.conditions_speciales) + '</td></tr>' : '') +
+        (d.notes ? '<tr><td>Notes</td><td>' + escHtml(d.notes) + '</td></tr>' : '') +
+      '</table>' +
+      '<div class="signature">' +
+        '<div class="signature__bloc">Signature responsable entrepôt<br><br><br></div>' +
+        '<div class="signature__bloc">Signature client / transporteur<br><br><br></div>' +
+      '</div>' +
+      '</body></html>';
+
+    const fenetre = window.open('', '_blank');
+    fenetre.document.write(contenu);
+    fenetre.document.close();
+    fenetre.focus();
+    setTimeout(function () { fenetre.print(); }, 400);
   });
 
   /* ---- Fermeture modales ---- */
@@ -399,7 +485,7 @@ document.addEventListener('DOMContentLoaded', function () {
   });
 
   /* ---- Listeners filtres ---- */
-  ['recherche-stock', 'filtre-type-stock', 'filtre-statut-stock', 'filtre-zone'].forEach(function (id) {
+  ['recherche-stock', 'filtre-type-stock', 'filtre-statut-stock', 'filtre-zone', 'filtre-regime'].forEach(function (id) {
     const el = document.getElementById(id);
     if (el) el.addEventListener('input', function () { pageActuelle = 1; appliquerFiltres(); });
   });
