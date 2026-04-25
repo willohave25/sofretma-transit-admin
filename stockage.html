@@ -110,6 +110,11 @@
             <div class="stat-card__valeur" id="compteur-stock-attente">—</div>
             <div class="stat-card__label">En attente</div>
           </div>
+          <div class="stat-card stat-card--bleu">
+            <div class="stat-card__icone">🏛️</div>
+            <div class="stat-card__valeur" id="compteur-stock-douane">—</div>
+            <div class="stat-card__label">Sous douane</div>
+          </div>
         </div>
 
         <!-- Plan d'occupation des zones entrepôt -->
@@ -157,6 +162,12 @@
             <option value="E">Zone E — Conteneurs</option>
             <option value="F">Zone F — Vrac</option>
           </select>
+          <select id="filtre-regime">
+            <option value="">Tous régimes</option>
+            <option value="hors_douane">🔓 Hors douane</option>
+            <option value="sous_douane">🏛️ Sous douane</option>
+            <option value="transit">🔄 Transit</option>
+          </select>
         </div>
 
         <!-- Tableau stockage -->
@@ -169,6 +180,7 @@
                   <th>Code client</th>
                   <th>Client</th>
                   <th>Type stockage</th>
+                  <th>Régime</th>
                   <th>Marchandise</th>
                   <th>Emplacement</th>
                   <th>Date entrée</th>
@@ -178,7 +190,7 @@
                 </tr>
               </thead>
               <tbody id="tbody-stockage">
-                <tr><td colspan="10" class="chargement">Chargement des données...</td></tr>
+                <tr><td colspan="11" class="chargement">Chargement des données...</td></tr>
               </tbody>
             </table>
           </div>
@@ -202,6 +214,7 @@
       <div class="modale__corps" id="detail-stock-corps"></div>
       <div class="modale__pied">
         <button class="btn btn--gris btn-fermer-modale">Fermer</button>
+        <button class="btn btn--vert" id="btn-bon-mouvement">🖨️ Bon de mouvement</button>
       </div>
     </div>
   </div>
@@ -365,6 +378,15 @@
             </div>
 
             <div class="form-groupe">
+              <label for="stock-regime">Régime douanier *</label>
+              <select id="stock-regime" name="regime_douanier" required>
+                <option value="hors_douane">🔓 Hors douane</option>
+                <option value="sous_douane">🏛️ Sous douane</option>
+                <option value="transit">🔄 Transit</option>
+              </select>
+            </div>
+
+            <div class="form-groupe">
               <label for="stock-date-entree">Date d'entrée *</label>
               <input type="date" id="stock-date-entree" name="date_entree" required>
             </div>
@@ -372,6 +394,11 @@
             <div class="form-groupe">
               <label for="stock-date-sortie">Date de sortie prévue</label>
               <input type="date" id="stock-date-sortie" name="date_sortie_prevue">
+            </div>
+
+            <div class="form-groupe form-groupe--plein">
+              <label for="stock-destination">Destination finale après entreposage</label>
+              <input type="text" id="stock-destination" name="destination_finale" placeholder="Ex: Entrepôt client Yopougon, Port d'Abidjan, Bamako...">
             </div>
 
           </div>
