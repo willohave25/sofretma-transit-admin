@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Formulaires reçus | Administration SOFRETMA TRANSIT</title>
+  <title>Candidatures | Administration SOFRETMA TRANSIT</title>
   <meta name="robots" content="noindex, nofollow">
   <link rel="icon" href="images/logo-sofretma-blanc.png">
   <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -48,10 +48,10 @@
         <a href="medias.html" class="sidebar__lien">
           <span class="icone">🖼️</span> Médiathèque
         </a>
-        <a href="formulaires.html" class="sidebar__lien actif">
+        <a href="formulaires.html" class="sidebar__lien">
           <span class="icone">📋</span> Formulaires reçus
         </a>
-        <a href="candidatures.html" class="sidebar__lien">
+        <a href="candidatures.html" class="sidebar__lien actif">
           <span class="icone">🏍️</span> Candidatures
         </a>
         <div class="sidebar__separateur"></div>
@@ -71,74 +71,74 @@
           <button class="hamburger-admin" id="hamburger-admin" aria-label="Menu">
             <span></span><span></span><span></span>
           </button>
-          <h1 class="topbar__titre">Formulaires reçus</h1>
+          <h1 class="topbar__titre">Candidatures reçues</h1>
         </div>
         <div class="topbar__droite">
-          <button class="btn btn--vert btn--sm" id="btn-export-formulaires">⬇ Export CSV</button>
+          <button class="btn btn--vert btn--sm" id="btn-export-candidatures">⬇ Export CSV</button>
         </div>
       </header>
 
       <main class="page-contenu">
 
         <!-- Compteurs rapides -->
-        <div class="stats-grille" style="grid-template-columns:repeat(3,1fr);margin-bottom:24px;">
+        <div class="stats-grille" style="grid-template-columns:repeat(4,1fr);margin-bottom:24px;">
           <div class="stat-card stat-card--bleu">
-            <div class="stat-card__icone">📋</div>
+            <div class="stat-card__icone">📩</div>
             <div class="stat-card__valeur" id="compteur-total">—</div>
             <div class="stat-card__label">Total reçu</div>
-          </div>
-          <div class="stat-card stat-card--vert">
-            <div class="stat-card__icone">✅</div>
-            <div class="stat-card__valeur" id="compteur-traites">—</div>
-            <div class="stat-card__label">Traités</div>
           </div>
           <div class="stat-card stat-card--or">
             <div class="stat-card__icone">⏳</div>
             <div class="stat-card__valeur" id="compteur-attente">—</div>
             <div class="stat-card__label">En attente</div>
           </div>
+          <div class="stat-card stat-card--vert">
+            <div class="stat-card__icone">✅</div>
+            <div class="stat-card__valeur" id="compteur-acceptees">—</div>
+            <div class="stat-card__label">Acceptées</div>
+          </div>
+          <div class="stat-card" style="border-color:rgba(229,62,62,.4);">
+            <div class="stat-card__icone">❌</div>
+            <div class="stat-card__valeur" id="compteur-refusees">—</div>
+            <div class="stat-card__label">Refusées</div>
+          </div>
         </div>
 
         <!-- Barre d'outils -->
         <div class="barre-outils">
           <div class="barre-outils__recherche">
-            <input type="text" id="recherche-formulaires" placeholder="Rechercher par nom ou email...">
+            <input type="text" id="recherche-candidatures" placeholder="Rechercher par nom, téléphone, commune...">
           </div>
-          <select id="filtre-type">
-            <option value="">Tous les types</option>
-            <option value="Maritime">Maritime</option>
-            <option value="Aérien">Aérien</option>
-            <option value="Ferroviaire">Ferroviaire</option>
-            <option value="Terrestre">Terrestre</option>
-            <option value="Bureau d'achats">Bureau d'achats</option>
-            <option value="Voyages">Voyages</option>
-            <option value="Prestations">Prestations</option>
-            <option value="Carrière">Carrière</option>
+          <select id="filtre-poste">
+            <option value="">Tous les postes</option>
+            <option value="livreur-moto">Livreur à moto</option>
           </select>
-          <select id="filtre-traite">
+          <select id="filtre-statut">
             <option value="">Tous les statuts</option>
-            <option value="non_traite">En attente</option>
-            <option value="traite">Traités</option>
+            <option value="en_attente">En attente</option>
+            <option value="acceptee">Acceptées</option>
+            <option value="refusee">Refusées</option>
           </select>
         </div>
 
-        <!-- Tableau formulaires -->
+        <!-- Tableau candidatures -->
         <div class="card">
           <div class="table-wrapper">
             <table>
               <thead>
                 <tr>
-                  <th>Type</th>
-                  <th>Nom</th>
-                  <th>Email</th>
+                  <th>Nom complet</th>
                   <th>Téléphone</th>
+                  <th>Commune</th>
+                  <th>Poste</th>
+                  <th>Permis</th>
                   <th>Date envoi</th>
                   <th>Statut</th>
                   <th>Actions</th>
                 </tr>
               </thead>
-              <tbody id="tbody-formulaires">
-                <tr><td colspan="7" class="chargement">Chargement des données...</td></tr>
+              <tbody id="tbody-candidatures">
+                <tr><td colspan="8" class="chargement">Chargement des données...</td></tr>
               </tbody>
             </table>
           </div>
@@ -152,15 +152,17 @@
 
   </div>
 
-  <!-- MODALE DÉTAIL FORMULAIRE -->
-  <div class="overlay" id="overlay-detail-formulaire">
-    <div class="modale">
+  <!-- MODALE DÉTAIL CANDIDATURE -->
+  <div class="overlay" id="overlay-detail-candidature">
+    <div class="modale" style="max-width:700px;">
       <div class="modale__entete">
-        <h2 class="modale__titre">Détails du formulaire</h2>
+        <h2 class="modale__titre">Détails de la candidature</h2>
         <button class="modale__fermer" aria-label="Fermer">✕</button>
       </div>
-      <div class="modale__corps" id="detail-formulaire-corps"></div>
+      <div class="modale__corps" id="detail-candidature-corps"></div>
       <div class="modale__pied">
+        <button class="btn btn--rouge btn-refuser" style="display:none;">Refuser</button>
+        <button class="btn btn--vert btn-accepter" style="display:none;">Accepter</button>
         <button class="btn btn--gris btn-fermer-modale">Fermer</button>
       </div>
     </div>
@@ -170,7 +172,7 @@
   <div class="toast-container" id="toast-container"></div>
 
   <script src="js/auth.js"></script>
-  <script src="js/formulaires.js"></script>
+  <script src="js/candidatures.js"></script>
 
 </body>
 </html>
